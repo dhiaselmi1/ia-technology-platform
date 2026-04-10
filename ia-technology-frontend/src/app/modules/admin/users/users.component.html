@@ -1,0 +1,28 @@
+<div class="py-8">
+  <h1 class="text-3xl font-bold mb-4">Gestion des Utilisateurs</h1>
+
+  <p-table [value]="users" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nom d'utilisateur</th>
+        <th>Email</th>
+        <th>Rôle</th>
+        <th>Actif</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td><p-tag [value]="user.role"></p-tag></td>
+        <td><p-tag [value]="user.active ? 'Oui' : 'Non'" [severity]="user.active ? 'success' : 'danger'"></p-tag></td>
+        <td>
+          <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteUser(user.id)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-toast></p-toast>
+</div>

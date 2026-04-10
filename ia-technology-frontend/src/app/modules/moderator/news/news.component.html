@@ -1,0 +1,53 @@
+<div class="py-8">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1 class="text-3xl font-bold">Gestion des Actualités</h1>
+    <p-button label="Ajouter" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+  </div>
+
+  <p-table [value]="news" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Titre</th>
+        <th>À la une</th>
+        <th>Auteur</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{ item.title }}</td>
+        <td><p-tag [value]="item.featured ? 'Oui' : 'Non'" [severity]="item.featured ? 'success' : 'info'"></p-tag></td>
+        <td>{{ item.authorUsername }}</td>
+        <td>
+          <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" (onClick)="editNews(item)"></p-button>
+          <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteNews(item.id)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="displayDialog" header="Actualité" [modal]="true" [style]="{ width: '70vw' }">
+    <form [formGroup]="form" (ngSubmit)="saveNews()" class="flex flex-column gap-3">
+      <div class="flex flex-column gap-2">
+        <label>Titre</label>
+        <input pInputText formControlName="title" />
+      </div>
+      <div class="flex flex-column gap-2">
+        <label>Contenu</label>
+        <p-editor formControlName="content" [modules]="{ toolbar: [['bold', 'italic'], ['link']] }" [style]="{ height: '320px' }"></p-editor>
+      </div>
+      <div class="flex gap-3">
+        <div class="flex-1 flex flex-column gap-2">
+          <label>Image URL</label>
+          <input pInputText formControlName="imageUrl" />
+        </div>
+        <div class="flex align-items-end">
+          <p-checkbox formControlName="featured" label="À la une"></p-checkbox>
+        </div>
+      </div>
+      <p-button type="submit" label="Sauvegarder" [loading]="loading"></p-button>
+    </form>
+  </p-dialog>
+
+  <p-toast></p-toast>
+</div>

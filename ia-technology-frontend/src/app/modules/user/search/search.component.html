@@ -1,0 +1,39 @@
+<div class="py-8">
+  <h1 class="text-3xl font-bold mb-6">Recherche Avancée</h1>
+
+  <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <p-inputGroup>
+        <input pInputText [(ngModel)]="searchQuery" placeholder="Rechercher..." />
+      </p-inputGroup>
+      <p-dropdown [(ngModel)]="selectedDomain" [options]="domains" optionLabel="name" optionValue="id" placeholder="Domaine"></p-dropdown>
+      <p-button label="Rechercher" icon="pi pi-search" (onClick)="performSearch()"></p-button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Publications -->
+    <div>
+      <h2 class="text-2xl font-bold mb-4">Publications ({{ publications.length }})</h2>
+      <div class="flex flex-column gap-3">
+        <p-card *ngFor="let pub of publications">
+          <h5 class="font-bold mb-2">{{ pub.title }}</h5>
+          <p class="text-sm text-gray-600 mb-2">{{ pub.abstract_ | slice:0:150 }}...</p>
+          <p class="text-xs text-gray-500">{{ pub.researcherName }} • {{ pub.domainName }}</p>
+        </p-card>
+      </div>
+    </div>
+
+    <!-- Researchers -->
+    <div>
+      <h2 class="text-2xl font-bold mb-4">Chercheurs ({{ researchers.length }})</h2>
+      <div class="flex flex-column gap-3">
+        <p-card *ngFor="let researcher of researchers">
+          <h5 class="font-bold mb-2">{{ researcher.firstName }} {{ researcher.lastName }}</h5>
+          <p class="text-sm text-gray-600 mb-2">{{ researcher.bio | slice:0:150 }}...</p>
+          <p class="text-xs text-gray-500">{{ researcher.domainName }} • {{ researcher.email }}</p>
+        </p-card>
+      </div>
+    </div>
+  </div>
+</div>

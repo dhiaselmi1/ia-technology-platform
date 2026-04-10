@@ -1,0 +1,56 @@
+<div class="py-8">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1 class="text-3xl font-bold">Gestion des Chercheurs</h1>
+    <p-button label="Ajouter" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+  </div>
+
+  <p-table [value]="researchers" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Domaine</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-researcher>
+      <tr>
+        <td>{{ researcher.firstName }} {{ researcher.lastName }}</td>
+        <td>{{ researcher.email }}</td>
+        <td>{{ researcher.domainName }}</td>
+        <td>
+          <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" (onClick)="editResearcher(researcher)"></p-button>
+          <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteResearcher(researcher.id)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="displayDialog" header="Chercheur" [modal]="true" [style]="{ width: '50vw' }">
+    <form [formGroup]="form" (ngSubmit)="saveResearcher()" class="flex flex-column gap-3">
+      <div class="flex flex-column gap-2">
+        <label>Prénom</label>
+        <input pInputText formControlName="firstName" />
+      </div>
+      <div class="flex flex-column gap-2">
+        <label>Nom</label>
+        <input pInputText formControlName="lastName" />
+      </div>
+      <div class="flex flex-column gap-2">
+        <label>Email</label>
+        <input pInputText type="email" formControlName="email" />
+      </div>
+      <div class="flex flex-column gap-2">
+        <label>Bio</label>
+        <textarea pInputTextarea formControlName="bio" rows="3"></textarea>
+      </div>
+      <div class="flex flex-column gap-2">
+        <label>Domaine</label>
+        <p-dropdown formControlName="domainId" [options]="domains" optionLabel="name" optionValue="id" placeholder="Sélectionner"></p-dropdown>
+      </div>
+      <p-button type="submit" label="Sauvegarder" [loading]="loading"></p-button>
+    </form>
+  </p-dialog>
+
+  <p-toast></p-toast>
+</div>

@@ -1,0 +1,20 @@
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--p-font-family, system-ui, -apple-system, sans-serif);
+  background-color: var(--p-surface-ground, #f8f9fa);
+  color: var(--p-text-color, #495057);
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

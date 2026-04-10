@@ -1,0 +1,70 @@
+# ==========================================
+# Java / Maven (Backend)
+# ==========================================
+backend/target/
+backend/*.class
+backend/*.jar
+backend/*.war
+backend/.mvn/wrapper/maven-wrapper.jar
+!backend/.mvn/wrapper/maven-wrapper.properties
+
+# ==========================================
+# Angular / Node (Frontend)
+# ==========================================
+ia-technology-frontend/node_modules/
+ia-technology-frontend/dist/
+ia-technology-frontend/.angular/
+ia-technology-frontend/.sass-cache/
+ia-technology-frontend/connect.lock
+ia-technology-frontend/coverage/
+ia-technology-frontend/libpeerconnection.log
+ia-technology-frontend/npm-debug.log
+ia-technology-frontend/yarn-error.log
+
+# ==========================================
+# Python (AI Service)
+# ==========================================
+ai-service/__pycache__/
+ai-service/*.pyc
+ai-service/*.pyo
+ai-service/venv/
+ai-service/.venv/
+ai-service/.env
+ai-service/*.egg-info/
+
+# ==========================================
+# Uploaded files (runtime)
+# ==========================================
+backend/uploads/
+
+# ==========================================
+# IDE
+# ==========================================
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+!ia-technology-frontend/.vscode/extensions.json
+!ia-technology-frontend/.vscode/launch.json
+!ia-technology-frontend/.vscode/tasks.json
+
+# ==========================================
+# OS
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# Logs
+# ==========================================
+*.log
+logs/
+
+# ==========================================
+# Sensitive / local config overrides
+# ==========================================
+application-local.properties
+application-local.yml
+.env

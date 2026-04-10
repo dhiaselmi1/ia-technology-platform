@@ -1,0 +1,58 @@
+<div class="flex justify-content-center align-items-center min-h-screen">
+  <p-card class="w-full" [style]="{ 'max-width': '400px' }">
+    <ng-template pTemplate="header">
+      <div class="text-center p-4">
+        <h1 class="text-2xl font-bold">IA-Technology</h1>
+        <p class="text-gray-600">Connexion</p>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-column gap-3">
+      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage"></p-message>
+
+      <div class="flex flex-column gap-2">
+        <label for="email" class="font-semibold">Email</label>
+        <input
+          pInputText
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="votre@email.com"
+          [class.ng-invalid]="email?.invalid && email?.touched"
+        />
+        <small class="text-red-500" *ngIf="email?.invalid && email?.touched">
+          {{ email?.errors?.['required'] ? 'Email requis' : 'Email invalide' }}
+        </small>
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <label for="password" class="font-semibold">Mot de passe</label>
+        <input
+          pInputText
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="••••••"
+          [class.ng-invalid]="password?.invalid && password?.touched"
+        />
+        <small class="text-red-500" *ngIf="password?.invalid && password?.touched">
+          {{ password?.errors?.['required'] ? 'Mot de passe requis' : 'Min 6 caractères' }}
+        </small>
+      </div>
+
+      <p-button
+        type="submit"
+        label="Se connecter"
+        [loading]="loading"
+        [disabled]="form.invalid || loading"
+        class="w-full"
+      ></p-button>
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="text-center">
+        <p class="text-sm">Pas encore de compte ? <a routerLink="/auth/register" class="text-blue-500 font-semibold">S'inscrire</a></p>
+      </div>
+    </ng-template>
+  </p-card>
+</div>

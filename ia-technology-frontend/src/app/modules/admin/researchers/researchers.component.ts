@@ -28,7 +28,7 @@ export class ResearchersComponent implements OnInit {
   displayDialog = false;
   form: FormGroup;
   loading = false;
-  editingId: Long | null = null;
+  editingId: number | null = null;
 
   constructor() {
     this.form = this.fb.group({
@@ -93,7 +93,7 @@ export class ResearchersComponent implements OnInit {
     });
   }
 
-  deleteResearcher(id: Long): void {
+  deleteResearcher(id: number): void {
     if (confirm('Êtes-vous sûr ?')) {
       this.apiService.delete(`researchers/${id}`).subscribe({
         next: () => {

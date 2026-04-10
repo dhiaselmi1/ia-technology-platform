@@ -1,8 +1,6 @@
 import { Routes } from '@angular/router';
+import { NewsComponent } from './news/news.component';
 
 export const MODERATOR_ROUTES: Routes = [
-  {
-    path: '',
-    loadComponent: () => import('./news/news.component').then(m => m.NewsComponent)
-  }
+  { path: '', component: NewsComponent }
 ];

@@ -26,7 +26,7 @@ export class DomainsComponent implements OnInit {
   displayDialog = false;
   form: FormGroup;
   loading = false;
-  editingId: Long | null = null;
+  editingId: number | null = null;
 
   constructor() {
     this.form = this.fb.group({
@@ -81,7 +81,7 @@ export class DomainsComponent implements OnInit {
     });
   }
 
-  deleteDomain(id: Long): void {
+  deleteDomain(id: number): void {
     if (confirm('Êtes-vous sûr ?')) {
       this.apiService.delete(`domains/${id}`).subscribe({
         next: () => {

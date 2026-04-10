@@ -23,7 +23,7 @@ export class SearchComponent implements OnInit {
   publications: any[] = [];
   researchers: any[] = [];
   domains: any[] = [];
-  selectedDomain: Long | null = null;
+  selectedDomain: number | null = null;
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {

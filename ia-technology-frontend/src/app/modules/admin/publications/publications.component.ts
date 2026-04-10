@@ -30,7 +30,7 @@ export class PublicationsComponent implements OnInit {
     });
   }
 
-  deletePublication(id: Long): void {
+  deletePublication(id: number): void {
     if (confirm('Êtes-vous sûr ?')) {
       this.apiService.delete(`publications/${id}`).subscribe({
         next: () => {

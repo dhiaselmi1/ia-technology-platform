@@ -1,24 +1,14 @@
 import { Routes } from '@angular/router';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ResearchersComponent } from './researchers/researchers.component';
+import { DomainsComponent } from './domains/domains.component';
+import { PublicationsComponent } from './publications/publications.component';
+import { UsersComponent } from './users/users.component';
 
 export const ADMIN_ROUTES: Routes = [
-  {
-    path: '',
-    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
-  },
-  {
-    path: 'researchers',
-    loadComponent: () => import('./researchers/researchers.component').then(m => m.ResearchersComponent)
-  },
-  {
-    path: 'domains',
-    loadComponent: () => import('./domains/domains.component').then(m => m.DomainsComponent)
-  },
-  {
-    path: 'publications',
-    loadComponent: () => import('./publications/publications.component').then(m => m.PublicationsComponent)
-  },
-  {
-    path: 'users',
-    loadComponent: () => import('./users/users.component').then(m => m.UsersComponent)
-  }
+  { path: '', component: DashboardComponent },
+  { path: 'researchers', component: ResearchersComponent },
+  { path: 'domains', component: DomainsComponent },
+  { path: 'publications', component: PublicationsComponent },
+  { path: 'users', component: UsersComponent }
 ];

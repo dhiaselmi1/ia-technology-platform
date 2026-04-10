@@ -30,7 +30,7 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  deleteUser(id: Long): void {
+  deleteUser(id: number): void {
     if (confirm('Êtes-vous sûr ?')) {
       this.apiService.delete(`users/${id}`).subscribe({
         next: () => {

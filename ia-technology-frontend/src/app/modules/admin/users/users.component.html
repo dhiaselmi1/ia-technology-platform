@@ -15,8 +15,8 @@
       <tr>
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
-        <td><p-tag [value]="user.role"></p-tag></td>
-        <td><p-tag [value]="user.active ? 'Oui' : 'Non'" [severity]="user.active ? 'success' : 'danger'"></p-tag></td>
+        <td>{{ user.role }}</td>
+        <td>{{ user.active ? 'Oui' : 'Non' }}</td>
         <td>
           <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteUser(user.id)"></p-button>
         </td>

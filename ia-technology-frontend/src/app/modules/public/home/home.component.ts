@@ -1,16 +1,18 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
+import { TagModule } from 'primeng/tag';
 import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, CardModule, ButtonModule, InputGroupModule, InputTextModule],
+  imports: [CommonModule, FormsModule, RouterLink, CardModule, ButtonModule, InputGroupModule, InputTextModule, TagModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

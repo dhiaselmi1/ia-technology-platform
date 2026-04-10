@@ -7,13 +7,15 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { EditorModule } from 'primeng/editor';
 import { ToastModule } from 'primeng/toast';
+import { CheckboxModule } from 'primeng/checkbox';
+import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, EditorModule, ToastModule],
+  imports: [CommonModule, ReactiveFormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, EditorModule, ToastModule, CheckboxModule, TagModule],
   providers: [MessageService],
   templateUrl: './news.component.html'
 })
@@ -26,7 +28,7 @@ export class NewsComponent implements OnInit {
   displayDialog = false;
   form: FormGroup;
   loading = false;
-  editingId: Long | null = null;
+  editingId: number | null = null;
 
   constructor() {
     this.form = this.fb.group({
@@ -82,7 +84,7 @@ export class NewsComponent implements OnInit {
     });
   }
 
-  deleteNews(id: Long): void {
+  deleteNews(id: number): void {
     if (confirm('Êtes-vous sûr ?')) {
       this.apiService.delete(`news/${id}`).subscribe({
         next: () => {

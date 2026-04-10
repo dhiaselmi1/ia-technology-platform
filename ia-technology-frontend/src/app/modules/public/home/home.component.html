@@ -34,12 +34,10 @@
   <div class="mb-8">
     <h2 class="text-3xl font-bold mb-4">Publications Récentes</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <p-card *ngFor="let pub of publications" class="h-full">
-        <ng-template pTemplate="header">
-          <div class="bg-gray-100 p-4 text-center">
-            <p class="text-sm text-gray-600 m-0">{{ pub.domainName }}</p>
-          </div>
-        </ng-template>
+      <div *ngFor="let pub of publications" class="border rounded-lg p-4 shadow-sm">
+        <div class="bg-gray-100 p-3 mb-3 rounded text-center">
+          <p class="text-sm text-gray-600 m-0">{{ pub.domainName }}</p>
+        </div>
         <h5 class="font-bold mb-2">{{ pub.title }}</h5>
         <p class="text-sm text-gray-600 mb-3">{{ pub.abstract_ | slice:0:100 }}...</p>
         <p class="text-xs text-gray-500 mb-3">Par: {{ pub.researcherName }}</p>
@@ -49,7 +47,7 @@
           icon="pi pi-arrow-right"
           iconPos="right"
         ></p-button>
-      </p-card>
+      </div>
     </div>
   </div>
 
@@ -57,20 +55,14 @@
   <div class="mb-8">
     <h2 class="text-3xl font-bold mb-4">Actualités</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <p-card *ngFor="let item of news" class="h-full">
-        <ng-template pTemplate="header">
-          <div class="bg-blue-100 p-4 text-center">
-            <p-tag
-              *ngIf="item.featured"
-              value="À la une"
-              severity="success"
-            ></p-tag>
-          </div>
-        </ng-template>
+      <div *ngFor="let item of news" class="border rounded-lg p-4 shadow-sm">
+        <div class="bg-blue-100 p-3 mb-3 rounded text-center">
+          <span *ngIf="item.featured" class="text-xs bg-green-500 text-white px-2 py-1 rounded">À la une</span>
+        </div>
         <h5 class="font-bold mb-2">{{ item.title }}</h5>
         <p class="text-sm text-gray-600 mb-3">{{ item.content | slice:0:100 }}...</p>
         <p class="text-xs text-gray-500">Par: {{ item.authorUsername }}</p>
-      </p-card>
+      </div>
     </div>
   </div>
 </div>

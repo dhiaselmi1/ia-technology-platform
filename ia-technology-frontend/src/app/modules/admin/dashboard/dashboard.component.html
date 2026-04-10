@@ -3,34 +3,34 @@
 
   <!-- Stats Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <p-card class="text-center">
+    <div class="border rounded-lg p-6 text-center shadow-sm">
       <h3 class="text-gray-600 mb-2">Chercheurs</h3>
       <p class="text-4xl font-bold text-blue-500">{{ stats.researchers }}</p>
       <a routerLink="/admin/researchers" class="text-blue-500 text-sm mt-2 inline-block">Gérer →</a>
-    </p-card>
+    </div>
 
-    <p-card class="text-center">
+    <div class="border rounded-lg p-6 text-center shadow-sm">
       <h3 class="text-gray-600 mb-2">Publications</h3>
       <p class="text-4xl font-bold text-purple-500">{{ stats.publications }}</p>
       <a routerLink="/admin/publications" class="text-purple-500 text-sm mt-2 inline-block">Gérer →</a>
-    </p-card>
+    </div>
 
-    <p-card class="text-center">
+    <div class="border rounded-lg p-6 text-center shadow-sm">
       <h3 class="text-gray-600 mb-2">Domaines</h3>
       <p class="text-4xl font-bold text-pink-500">{{ stats.domains }}</p>
       <a routerLink="/admin/domains" class="text-pink-500 text-sm mt-2 inline-block">Gérer →</a>
-    </p-card>
+    </div>
 
-    <p-card class="text-center">
+    <div class="border rounded-lg p-6 text-center shadow-sm">
       <h3 class="text-gray-600 mb-2">Utilisateurs</h3>
       <p class="text-4xl font-bold text-amber-500">{{ stats.users }}</p>
       <a routerLink="/admin/users" class="text-amber-500 text-sm mt-2 inline-block">Gérer →</a>
-    </p-card>
+    </div>
   </div>
 
   <!-- Chart -->
-  <p-card class="mb-8">
+  <div class="border rounded-lg p-6 shadow-sm">
     <h3 class="text-xl font-bold mb-4">Statistiques</h3>
     <p-chart type="doughnut" [data]="chartData" [options]="chartOptions"></p-chart>
-  </p-card>
+  </div>
 </div>

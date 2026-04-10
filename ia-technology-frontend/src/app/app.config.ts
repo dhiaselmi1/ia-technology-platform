@@ -4,6 +4,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
+import Lara from '@primeng/themes/lara';  // ✅ import correct
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([jwtInterceptor]), withFetch()),
     providePrimeNG({
       theme: {
-        preset: 'lara',
+        preset: Lara,   // ✅ objet importé
         options: { darkModeSelector: '.dark-mode' }
       }
     })

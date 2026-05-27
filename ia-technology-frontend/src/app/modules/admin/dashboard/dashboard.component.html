@@ -63,6 +63,31 @@
   </div>
 </div>
 
+<!-- AI Trends Prediction -->
+<div class="data-card" *ngIf="trends.length > 0">
+  <div class="card-header">
+    <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> Pr&eacute;diction de tendances IA</h3>
+    <span class="chart-subtitle">R&eacute;gression lin&eacute;aire</span>
+  </div>
+  <div class="trends-grid">
+    <div *ngFor="let t of trends" class="trend-item">
+      <div class="trend-info">
+        <strong>{{ t.domain }}</strong>
+        <span class="trend-count">{{ t.total_publications }} publications</span>
+      </div>
+      <div class="trend-indicator">
+        <i class="pi" [class.pi-arrow-up]="t.trend === 'rising'" [class.pi-arrow-down]="t.trend === 'declining'"
+           [class.pi-minus]="t.trend === 'stable'"
+           [style.color]="t.trend === 'rising' ? 'var(--success)' : t.trend === 'declining' ? 'var(--danger)' : 'var(--text-muted)'"></i>
+        <span [class]="'trend-badge trend-' + t.trend">
+          {{ t.trend === 'rising' ? 'En hausse' : t.trend === 'declining' ? 'En baisse' : 'Stable' }}
+        </span>
+        <span class="trend-slope">{{ t.trend_slope > 0 ? '+' : '' }}{{ (t.trend_slope * 100).toFixed(0) }}%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Recent Activity -->
 <div class="data-card">
   <div class="card-header">

@@ -110,6 +110,48 @@ public class AiService {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> classifyDomain(String text, List<com.iatechnology.dto.PublicationDTO> corpus, int topN) {
+        try {
+            List<Map<String, Object>> corpusList = corpus.stream()
+                    .map(p -> {
+                        Map<String, Object> m = new java.util.HashMap<>();
+                        m.put("id", p.getId());
+                        m.put("text", p.getTitle() + " " + (p.getAbstract_() != null ? p.getAbstract_() : ""));
+                        m.put("domain", p.getDomainName() != null ? p.getDomainName() : "");
+                        return m;
+                    })
+                    .toList();
+
+            Map<String, Object> request = Map.of("text", text, "corpus", corpusList, "top_n", topN);
+            return restTemplate.postForObject(aiServiceUrl + "/classify", request, Map.class);
+        } catch (Exception e) {
+            log.error("Error calling AI service for classification", e);
+            return Map.of("predictions", List.of(), "metrics", Map.of());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> predictTrends(List<com.iatechnology.dto.PublicationDTO> pubs) {
+        try {
+            List<Map<String, Object>> pubList = pubs.stream()
+                    .filter(p -> p.getPublishedDate() != null)
+                    .map(p -> {
+                        Map<String, Object> m = new java.util.HashMap<>();
+                        m.put("domain", p.getDomainName() != null ? p.getDomainName() : "");
+                        m.put("date", p.getPublishedDate().toString());
+                        return m;
+                    })
+                    .toList();
+
+            Map<String, Object> request = Map.of("publications", pubList);
+            return restTemplate.postForObject(aiServiceUrl + "/predict-trends", request, Map.class);
+        } catch (Exception e) {
+            log.error("Error calling AI service for trend prediction", e);
+            return Map.of("trends", List.of());
+        }
+    }
+
     @lombok.Data @lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor
     public static class RecommendRequest {
         private String target_text;

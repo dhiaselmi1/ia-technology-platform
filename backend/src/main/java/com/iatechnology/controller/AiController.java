@@ -79,6 +79,22 @@ public class AiController {
         return ResponseEntity.ok(aiService.summarize(text, mode));
     }
 
+    @PostMapping("/classify")
+    @Operation(summary = "Classify publication text into a domain")
+    public ResponseEntity<Map<String, Object>> classify(
+            @RequestParam String text,
+            @RequestParam(defaultValue = "3") int topN) {
+        var corpus = publicationService.getAll();
+        return ResponseEntity.ok(aiService.classifyDomain(text, corpus, topN));
+    }
+
+    @GetMapping("/predict-trends")
+    @Operation(summary = "Predict domain publication trends")
+    public ResponseEntity<Map<String, Object>> predictTrends() {
+        var pubs = publicationService.getAll();
+        return ResponseEntity.ok(aiService.predictTrends(pubs));
+    }
+
     @GetMapping("/researcher-profile/{researcherId}")
     @Operation(summary = "Get AI-generated researcher profile with keywords and similar researchers")
     public ResponseEntity<Map<String, Object>> researcherProfile(

@@ -126,6 +126,24 @@
           <option [ngValue]="null">-- S&eacute;lectionner --</option>
           <option *ngFor="let d of domains" [ngValue]="d.id">{{ d.name }}</option>
         </select>
+        <button class="btn btn-sm btn-outline ai-suggest-btn" (click)="classifyDomain()" [disabled]="classifying"
+                style="margin-top:.5rem" type="button">
+          <i class="pi" [class.pi-bolt]="!classifying" [class.pi-spin]="classifying" [class.pi-spinner]="classifying"></i>
+          {{ classifying ? 'Analyse...' : 'Suggérer le domaine (IA)' }}
+        </button>
+        <!-- AI predictions -->
+        <div *ngIf="aiPredictions.length > 0" class="ai-predictions">
+          <div *ngFor="let pred of aiPredictions" class="ai-pred-item" (click)="applyPrediction(pred)">
+            <span class="ai-pred-domain">{{ pred.domain }}</span>
+            <span class="ai-pred-confidence">{{ (pred.confidence * 100).toFixed(1) }}%</span>
+            <div class="ai-pred-bar">
+              <div class="ai-pred-fill" [style.width.%]="pred.confidence * 100"></div>
+            </div>
+          </div>
+          <div *ngIf="aiMetrics" class="ai-metrics-info">
+            <small><i class="pi pi-info-circle"></i> Mod&egrave;le : {{ aiMetrics.model }} | Pr&eacute;cision CV : {{ (aiMetrics.accuracy_cv * 100).toFixed(1) }}% | {{ aiMetrics.n_samples }} &eacute;chantillons</small>
+          </div>
+        </div>
       </div>
     </div>
     <div class="grid-2">

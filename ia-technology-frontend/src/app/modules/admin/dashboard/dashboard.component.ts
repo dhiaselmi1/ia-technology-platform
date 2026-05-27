@@ -20,6 +20,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   stats = { researchers: 0, publications: 0, domains: 0, users: 0, news: 0 };
   recentActivity: any[] = [];
+  trends: any[] = [];
 
   @ViewChild('domainChart') domainChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('monthChart') monthChartRef!: ElementRef<HTMLCanvasElement>;
@@ -50,6 +51,14 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     });
 
     this.loadChartData();
+    this.loadTrends();
+  }
+
+  private loadTrends(): void {
+    this.api.get<any>('ai/predict-trends').subscribe({
+      next: (res) => this.trends = res?.trends || [],
+      error: () => {}
+    });
   }
 
   ngAfterViewInit(): void {

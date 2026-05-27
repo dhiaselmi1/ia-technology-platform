@@ -71,6 +71,65 @@
   font-weight: 500;
 }
 
+.trends-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: .75rem;
+  padding: .5rem 0;
+}
+
+.trend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .875rem 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius);
+  transition: background .15s;
+
+  &:hover { background: var(--surface-ground); }
+}
+
+.trend-info {
+  display: flex;
+  flex-direction: column;
+  gap: .125rem;
+
+  strong { font-size: .875rem; }
+}
+
+.trend-count {
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+
+.trend-indicator {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.trend-badge {
+  font-size: .6875rem;
+  font-weight: 600;
+  padding: .25rem .5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.trend-rising { background: #dcfce7; color: #166534; }
+.trend-declining { background: #fef2f2; color: #991b1b; }
+.trend-stable { background: var(--surface-ground); color: var(--text-muted); }
+
+.trend-slope {
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 40px;
+  text-align: right;
+}
+
 @media (max-width: 1024px) {
   .charts-row {
     grid-template-columns: 1fr 1fr;

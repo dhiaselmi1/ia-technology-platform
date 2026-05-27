@@ -201,3 +201,31 @@ def summarize(req: SummarizeRequest):
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
+
+
+# ── Classification & Prediction ──────────────────────────────
+
+class ClassifyRequest(BaseModel):
+    text: str
+    corpus: list[dict]  # [{"id": int, "text": str, "domain": str}]
+    top_n: int = 3
+
+
+class TrendRequest(BaseModel):
+    publications: list[dict]  # [{"domain": str, "date": str}]
+
+
+@app.post("/classify")
+def classify(req: ClassifyRequest):
+    if not req.text.strip():
+        raise HTTPException(status_code=400, detail="Text cannot be empty")
+    from classifier import classify_domain
+    return classify_domain(req.text, req.corpus, req.top_n)
+
+
+@app.post("/predict-trends")
+def predict_trends(req: TrendRequest):
+    if not req.publications:
+        raise HTTPException(status_code=400, detail="Publications list cannot be empty")
+    from classifier import predict_trends
+    return {"trends": predict_trends(req.publications)}

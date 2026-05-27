@@ -227,5 +227,5 @@ def classify(req: ClassifyRequest):
 def predict_trends(req: TrendRequest):
     if not req.publications:
         raise HTTPException(status_code=400, detail="Publications list cannot be empty")
-    from classifier import predict_trends
-    return {"trends": predict_trends(req.publications)}
+    from trend_classifier import classify_trends
+    return classify_trends(req.publications)

@@ -63,29 +63,89 @@
   </div>
 </div>
 
-<!-- AI Trends Prediction -->
-<div class="data-card" *ngIf="trends.length > 0">
-  <div class="card-header">
-    <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> Pr&eacute;diction de tendances IA</h3>
-    <span class="chart-subtitle">R&eacute;gression lin&eacute;aire</span>
-  </div>
-  <div class="trends-grid">
-    <div *ngFor="let t of trends" class="trend-item">
-      <div class="trend-info">
-        <strong>{{ t.domain }}</strong>
-        <span class="trend-count">{{ t.total_publications }} publications</span>
-      </div>
-      <div class="trend-indicator">
-        <i class="pi" [class.pi-arrow-up]="t.trend === 'rising'" [class.pi-arrow-down]="t.trend === 'declining'"
-           [class.pi-minus]="t.trend === 'stable'"
-           [style.color]="t.trend === 'rising' ? 'var(--success)' : t.trend === 'declining' ? 'var(--danger)' : 'var(--text-muted)'"></i>
-        <span [class]="'trend-badge trend-' + t.trend">
-          {{ t.trend === 'rising' ? 'En hausse' : t.trend === 'declining' ? 'En baisse' : 'Stable' }}
-        </span>
-        <span class="trend-slope">{{ t.trend_slope > 0 ? '+' : '' }}{{ (t.trend_slope * 100).toFixed(0) }}%</span>
-      </div>
+<!-- AI Trends Prediction (Random Forest) -->
+<div class="charts-row" style="grid-template-columns: 1fr 1fr">
+  <div class="chart-card">
+    <div class="chart-header">
+      <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> Pr&eacute;diction de tendances</h3>
+      <span class="chart-subtitle">Random Forest</span>
+    </div>
+    <div *ngIf="!trendsLoaded" style="text-align:center;padding:2rem;color:var(--text-muted)">
+      <i class="pi pi-spin pi-spinner"></i> Entra&icirc;nement du mod&egrave;le...
+    </div>
+    <div *ngIf="trendsLoaded && trendsError" style="padding:1.5rem;color:var(--text-muted);font-size:.875rem">
+      <i class="pi pi-exclamation-triangle" style="color:var(--warning)"></i> Service IA requis (port 8001).
+    </div>
+    <div class="chart-body" *ngIf="trendsLoaded && !trendsError">
+      <canvas #trendChart></canvas>
     </div>
   </div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> Importance des features</h3>
+      <span class="chart-subtitle">Feature Importance</span>
+    </div>
+    <div class="chart-body" *ngIf="trendsLoaded && !trendsError">
+      <canvas #featureChart></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Model metrics -->
+<div *ngIf="trendModelInfo" class="data-card">
+  <div class="card-header">
+    <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> M&eacute;triques du mod&egrave;le de classification</h3>
+    <span class="chart-subtitle">{{ trendModelInfo.model }}</span>
+  </div>
+  <div class="metrics-grid">
+    <div class="metric-item">
+      <div class="metric-value">{{ (trendModelInfo.accuracy_cv * 100).toFixed(1) }}%</div>
+      <div class="metric-label">Accuracy (CV)</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-value">{{ trendModelInfo.n_estimators }}</div>
+      <div class="metric-label">Estimateurs</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-value">{{ trendModelInfo.n_features }}</div>
+      <div class="metric-label">Features</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-value">{{ trendModelInfo.n_classes }}</div>
+      <div class="metric-label">Classes</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-value">{{ trendModelInfo.n_original_samples }}</div>
+      <div class="metric-label">Domaines</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-value">{{ trendModelInfo.n_augmented_samples }}</div>
+      <div class="metric-label">&Eacute;ch. augment&eacute;s</div>
+    </div>
+  </div>
+  <!-- Per-class metrics -->
+  <table class="data-table" *ngIf="trendModelInfo.per_class_metrics" style="margin-top:1rem">
+    <thead>
+      <tr>
+        <th>Classe</th>
+        <th>Precision</th>
+        <th>Recall</th>
+        <th>F1-Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cls of trendModelInfo.classes">
+        <td>
+          <span [class]="'trend-badge trend-' + cls">
+            {{ cls === 'rising' ? 'En hausse' : cls === 'declining' ? 'En baisse' : 'Stable' }}
+          </span>
+        </td>
+        <td>{{ (trendModelInfo.per_class_metrics[cls]?.precision * 100).toFixed(1) }}%</td>
+        <td>{{ (trendModelInfo.per_class_metrics[cls]?.recall * 100).toFixed(1) }}%</td>
+        <td>{{ (trendModelInfo.per_class_metrics[cls]?.f1_score * 100).toFixed(1) }}%</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <!-- Recent Activity -->

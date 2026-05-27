@@ -89,7 +89,7 @@ public class AiController {
     }
 
     @GetMapping("/predict-trends")
-    @Operation(summary = "Predict domain publication trends")
+    @Operation(summary = "Predict domain publication trends using Random Forest classifier")
     public ResponseEntity<Map<String, Object>> predictTrends() {
         var pubs = publicationService.getAll();
         return ResponseEntity.ok(aiService.predictTrends(pubs));

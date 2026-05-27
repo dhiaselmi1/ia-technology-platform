@@ -71,6 +71,55 @@
   font-weight: 500;
 }
 
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  padding: .5rem 0;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius);
+  background: var(--surface-ground);
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.metric-label {
+  font-size: .6875rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-muted);
+  margin-top: .25rem;
+}
+
+.trend-badge {
+  font-size: .6875rem;
+  font-weight: 600;
+  padding: .25rem .625rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.trend-rising { background: #dcfce7; color: #166534; }
+.trend-declining { background: #fef2f2; color: #991b1b; }
+.trend-stable { background: #fef9c3; color: #854d0e; }
+
+@media (max-width: 1024px) {
+  .metrics-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 .trends-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

@@ -21,10 +21,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   stats = { researchers: 0, publications: 0, domains: 0, users: 0, news: 0 };
   recentActivity: any[] = [];
   trends: any[] = [];
+  trendModelInfo: any = null;
+  trendsLoaded = false;
+  trendsError = false;
 
   @ViewChild('domainChart') domainChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('monthChart') monthChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('roleChart') roleChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('trendChart') trendChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('featureChart') featureChartRef!: ElementRef<HTMLCanvasElement>;
 
   private domainChart: Chart | null = null;
   private monthChart: Chart | null = null;
@@ -56,9 +61,107 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   private loadTrends(): void {
     this.api.get<any>('ai/predict-trends').subscribe({
-      next: (res) => this.trends = res?.trends || [],
-      error: () => {}
+      next: (res) => {
+        this.trends = res?.predictions || [];
+        this.trendModelInfo = res?.model_info || null;
+        this.trendsLoaded = true;
+        if (this.isBrowser) setTimeout(() => this.renderTrendCharts(), 200);
+      },
+      error: () => {
+        this.trendsError = true;
+        this.trendsLoaded = true;
+      }
     });
+  }
+
+  private renderTrendCharts(): void {
+    if (!this.trends.length) return;
+
+    if (this.trendChartRef?.nativeElement) {
+      const labels = this.trends.map(t => t.domain);
+      const confidences = this.trends.map(t => t.confidence * 100);
+      const trendColors = this.trends.map((t: any) =>
+        t.trend === 'rising' ? '#22c55e' : t.trend === 'declining' ? '#ef4444' : '#f59e0b'
+      );
+
+      new Chart(this.trendChartRef.nativeElement, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Confiance (%)',
+            data: confidences,
+            backgroundColor: trendColors,
+            borderRadius: 6,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx: any) => {
+                  const t = this.trends[ctx.dataIndex];
+                  const label = t.trend === 'rising' ? 'En hausse' : t.trend === 'declining' ? 'En baisse' : 'Stable';
+                  return label + ' — ' + ctx.raw.toFixed(1) + '% confiance';
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              min: 0, max: 100,
+              grid: { color: '#f1f5f9' },
+              ticks: { callback: (v: any) => v + '%', font: { size: 11 } }
+            },
+            y: {
+              ticks: { font: { size: 11 } },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    if (this.featureChartRef?.nativeElement && this.trendModelInfo?.feature_importance) {
+      const fi = this.trendModelInfo.feature_importance;
+      const labels = fi.map((f: any) => f.feature);
+      const values = fi.map((f: any) => f.importance * 100);
+
+      new Chart(this.featureChartRef.nativeElement, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Importance (%)',
+            data: values,
+            backgroundColor: '#7c3aed',
+            borderRadius: 6,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: {
+              grid: { color: '#f1f5f9' },
+              ticks: { callback: (v: any) => v.toFixed(0) + '%', font: { size: 11 } }
+            },
+            y: {
+              ticks: { font: { size: 10 } },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
   }
 
   ngAfterViewInit(): void {

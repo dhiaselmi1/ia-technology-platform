@@ -47,7 +47,6 @@ def classify_domain(
         max_iter=1000,
         C=1.0,
         solver="lbfgs",
-        multi_class="multinomial",
     )
     clf.fit(X, y)
 

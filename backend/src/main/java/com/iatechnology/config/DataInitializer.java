@@ -71,7 +71,7 @@ public class DataInitializer {
                 The key innovation lies in a new geometric configuration of the nanowire network that minimizes quasiparticle poisoning while maintaining the topological gap. \
                 We further demonstrate that our architecture can be scaled to 100+ qubits using standard semiconductor fabrication techniques, \
                 making it a viable path toward practical fault-tolerant quantum computation for optimization and cryptography applications.""",
-                    r5, quantum, now.minusMonths(17), false);
+                    r5, quantum, now.minusMonths(14), false);
 
             pub(pubRepo, "Deep Learning Pipelines for Real-Time Medical Image Segmentation", """
                 We present a multi-scale U-Net architecture optimized for real-time segmentation of pathological tissue in MRI and CT scans, \
@@ -83,7 +83,7 @@ public class DataInitializer {
                 A key contribution is our adaptive loss function that dynamically balances boundary precision and region coverage based on lesion size, \
                 which is particularly effective for small metastatic lesions that are often missed by standard segmentation approaches. \
                 Clinical evaluation by five board-certified radiologists confirms that our segmentation masks are clinically acceptable in 97% of cases.""",
-                    r2, cv, now.minusMonths(16), false);
+                    r2, cv, now.minusMonths(15), false);
 
             pub(pubRepo, "Side-Channel Attacks on Post-Quantum Cryptographic Implementations", """
                 This paper presents a comprehensive analysis of timing and power side-channel vulnerabilities in lattice-based encryption schemes, \
@@ -96,7 +96,7 @@ public class DataInitializer {
                 We evaluate the performance overhead of each countermeasure and show that full protection can be achieved with only a 23% increase in computation time. \
                 These findings are critical for the secure deployment of post-quantum cryptography in IoT devices and embedded systems \
                 as NIST transitions to quantum-resistant standards.""",
-                    r6, cyber, now.minusMonths(15), false);
+                    r6, cyber, now.minusMonths(16), false);
 
             pub(pubRepo, "Attention Mechanisms in Low-Resource Language Translation", """
                 We propose novel cross-lingual transfer approaches using lightweight adapter modules for machine translation involving under-resourced African and Asian languages. \
@@ -109,7 +109,7 @@ public class DataInitializer {
                 We also introduce a curriculum learning strategy that progressively increases translation difficulty, \
                 starting with high-resource related language pairs before transitioning to the target low-resource pair. \
                 Our approach makes high-quality neural machine translation accessible for languages with as few as 50,000 parallel sentences.""",
-                    r1, nlp, now.minusMonths(14), false);
+                    r1, nlp, now.minusMonths(3), false);
 
             pub(pubRepo, "Autonomous Navigation in Unstructured Outdoor Environments", """
                 We present a terrain-adaptive motion planning algorithm that combines LiDAR-inertial odometry with learned traversability cost maps \
@@ -137,7 +137,7 @@ public class DataInitializer {
                 The study also examines the feedback loop between algorithmic predictions and sentencing decisions, \
                 showing that biased predictions can amplify existing disparities over time through a reinforcement effect. \
                 We provide an open-source auditing toolkit and recommend specific policy interventions for legislatures considering algorithmic accountability laws.""",
-                    r4, ethics, now.minusMonths(12), false);
+                    r4, ethics, now.minusMonths(4), false);
 
             pub(pubRepo, "Federated Learning for Privacy-Preserving Healthcare Analytics", """
                 We present a differentially private federated learning framework enabling multi-hospital collaboration on clinical prediction tasks \
@@ -151,7 +151,7 @@ public class DataInitializer {
                 combined with error feedback. Our framework handles the statistical challenge of non-IID data distributions across hospitals \
                 through a personalization layer that adapts the global model to each institution's patient demographics. \
                 HIPAA compliance is verified through a formal privacy analysis and penetration testing by independent auditors.""",
-                    r7, nlp, now.minusMonths(11), false);
+                    r7, nlp, now.minusMonths(2), false);
 
             pub(pubRepo, "Protein Folding Prediction using Graph Neural Networks", """
                 We introduce ProtGNN, a novel graph neural network architecture achieving state-of-the-art accuracy on CASP15 targets \
@@ -166,7 +166,7 @@ public class DataInitializer {
                 We validate our predictions experimentally through X-ray crystallography on 5 novel protein targets, \
                 confirming RMSD values below 2.1 Angstroms for all cases. \
                 The model also excels at predicting the effects of point mutations on protein stability, achieving AUC of 0.91 on the ProTherm dataset.""",
-                    r8, bioinfo, now.minusMonths(10), false);
+                    r8, bioinfo, now.minusMonths(14), false);
 
             pub(pubRepo, "Real-Time 3D Object Detection from LiDAR Point Clouds", """
                 We present VoxelDet, an efficient voxel-based 3D object detection network capable of processing 100,000 LiDAR points in under 20 milliseconds \
@@ -180,7 +180,7 @@ public class DataInitializer {
                 improving detection of slow-moving and stationary objects by 12.4 mAP. \
                 The system is validated in a Level 4 autonomous vehicle test fleet over 50,000 km of urban and highway driving, \
                 achieving zero false-negative detections for pedestrians within 30 meters at a false-positive rate below 0.1 per kilometer.""",
-                    r9, cv, now.minusMonths(9), false);
+                    r9, cv, now.minusMonths(13), false);
 
             pub(pubRepo, "Multi-Agent Reinforcement Learning for Swarm Robotics", """
                 We develop decentralized coordination protocols enabling 50+ autonomous drones to collaborate in search-and-rescue scenarios \
@@ -195,7 +195,7 @@ public class DataInitializer {
                 achieving 89% of the simulated performance without any fine-tuning. \
                 Key robustness properties include graceful degradation under communication dropout (maintaining 80% performance with 30% message loss) \
                 and dynamic re-tasking capability when new drones join or leave the swarm during a mission.""",
-                    r11, emerging, now.minusMonths(8), false);
+                    r11, emerging, now.minusMonths(2), false);
 
             pub(pubRepo, "Formal Verification Methods for Neural Network Safety", """
                 We present automated verification tools for proving robustness bounds on safety-critical neural network controllers \
@@ -211,7 +211,7 @@ public class DataInitializer {
                 We apply our framework to verify a reinforcement-learned lane-keeping controller for autonomous vehicles, \
                 proving that steering angle deviations remain below 5 degrees for all perturbations within the sensor noise envelope. \
                 This represents the first formal safety guarantee for a neural network controller deployed in a production autonomous driving system.""",
-                    r3, robotics, now.minusMonths(8), false);
+                    r3, robotics, now.minusMonths(9), false);
 
             pub(pubRepo, "Lattice-Based Cryptography for IoT Constrained Devices", """
                 We present a lightweight implementation of the CRYSTALS-Kyber key encapsulation mechanism \
@@ -227,7 +227,7 @@ public class DataInitializer {
                 Security analysis includes resistance to side-channel attacks through constant-time execution and first-order masking. \
                 Field deployment in a smart grid pilot project with 1,200 IoT sensors demonstrates seamless integration \
                 with existing MQTT protocols and less than 2% increase in communication overhead compared to classical ECDH key exchange.""",
-                    r6, cyber, now.minusMonths(7), false);
+                    r6, cyber, now.minusMonths(12), false);
 
             pub(pubRepo, "Arabic Dialect Identification using Transformer Embeddings", """
                 We present a fine-tuned AraBERT model capable of distinguishing 25 Arabic dialects with 91.3% accuracy on the NADI 2024 benchmark, \
@@ -243,7 +243,7 @@ public class DataInitializer {
                 We release our trained model, augmented dataset, and a web API for dialect identification that processes text in under 50 milliseconds. \
                 Applications include dialect-aware machine translation, social media analysis for public health surveillance, \
                 and linguistic documentation of endangered dialectal varieties.""",
-                    r12, nlp, now.minusMonths(6), false);
+                    r12, nlp, now.minusMonths(1), false);
 
             pub(pubRepo, "Quantum Approximate Optimization for Supply Chain Logistics", """
                 We demonstrate the application of the Quantum Approximate Optimization Algorithm (QAOA) on IBM's 127-qubit Eagle processor \
@@ -258,7 +258,7 @@ public class DataInitializer {
                 solvable on current quantum hardware, achieving a 15% improvement over purely classical heuristics for instances with tight time windows. \
                 Economic analysis for a major European logistics provider suggests potential annual savings of 8-12% on fuel costs \
                 once quantum hardware with 1,000+ qubits becomes available, projected for 2027-2028.""",
-                    r5, quantum, now.minusMonths(5), true);
+                    r5, quantum, now.minusMonths(7), true);
 
             pub(pubRepo, "Explainable AI for Regulatory Compliance in Financial Services", """
                 We develop a comprehensive framework for generating human-readable justifications for automated credit scoring decisions, \
@@ -275,7 +275,7 @@ public class DataInitializer {
                 with an average explanation generation time of 200 milliseconds per application. \
                 A controlled user study with 200 loan applicants shows that our explanations increase trust in the decision by 34% \
                 and reduce complaint rates by 28% compared to standard rejection letters.""",
-                    r4, ethics, now.minusMonths(5), true);
+                    r4, ethics, now.minusMonths(2), true);
 
             pub(pubRepo, "LLM Fine-Tuning for Legal Document Analysis and Contract Review", """
                 We present LegalLLM, a domain-adapted large language model for automated contract clause extraction, risk assessment, and compliance checking, \
@@ -290,7 +290,7 @@ public class DataInitializer {
                 enabling automated triage where high-confidence extractions are accepted and low-confidence ones are routed to human reviewers. \
                 Deployment at three Am Law 100 firms demonstrates 60% reduction in contract review time with zero missed critical clauses \
                 over a 6-month evaluation period covering 12,000 contracts.""",
-                    r1, nlp, now.minusMonths(4), true);
+                    r1, nlp, now.minusMonths(1), true);
 
             pub(pubRepo, "Drug-Target Interaction Prediction using Bilinear Attention Networks", """
                 We present DrugBANet, a bilinear attention model for predicting novel drug-protein binding affinities, \
@@ -306,7 +306,7 @@ public class DataInitializer {
                 providing insights for medicinal chemistry optimization. Our virtual screening pipeline processes 10 million compounds \
                 against a target protein in under 4 hours on a single GPU, enabling rapid hit identification for drug discovery campaigns. \
                 We release our trained model and a web server for interactive drug-target interaction prediction.""",
-                    r8, bioinfo, now.minusMonths(4), false);
+                    r8, bioinfo, now.minusMonths(11), false);
 
             pub(pubRepo, "Contrastive Pre-training for Source Code Understanding and Bug Detection", """
                 We present CodeContrast, a self-supervised model that learns semantic representations of source code from 2 million GitHub repositories, \
@@ -371,7 +371,7 @@ public class DataInitializer {
                 Our model enables multi-institutional medical AI research by allowing hospitals to share synthetic datasets \
                 instead of real patient images, facilitating compliance with HIPAA, GDPR, and other healthcare privacy regulations. \
                 We release a curated synthetic dataset of 50,000 CT scans for public research use.""",
-                    r10, emerging, now.minusMonths(2), false);
+                    r10, emerging, now.minusMonths(1), false);
 
             pub(pubRepo, "Zero-Shot Cross-Modal Generalization in Vision-Language Models", """
                 We investigate prompt engineering strategies and architectural modifications enabling CLIP-based vision-language models \
@@ -387,7 +387,7 @@ public class DataInitializer {
                 and counting failures, providing diagnostic tools for the community. \
                 Our analysis shows that CLIP's zero-shot performance is strongly correlated with the frequency of concept co-occurrence in the pre-training data, \
                 suggesting that true compositional generalization remains an open challenge for current vision-language architectures.""",
-                    r9, cv, now.minusMonths(1), true);
+                    r9, cv, now.minusMonths(10), true);
 
             pub(pubRepo, "Quantum Error Correction with Rotated Surface Codes", """
                 We present an implementation of rotated surface codes on a 2D superconducting qubit lattice \
@@ -404,7 +404,7 @@ public class DataInitializer {
                 Memory lifetime experiments show that our encoded logical qubit maintains coherence 5.2x longer than any individual physical qubit, \
                 providing the first unambiguous demonstration of quantum error correction extending the useful lifetime of quantum information \
                 in a superconducting processor.""",
-                    r5, quantum, now.minusMonths(1), false);
+                    r5, quantum, now.minusMonths(3), false);
 
             pub(pubRepo, "Adversarial Robustness Evaluation of Vision-Language Safety Systems", """
                 We present a systematic evaluation of adversarial attacks on multimodal vision-language models used for content moderation and safety filtering, \

@@ -67,7 +67,7 @@
 <div class="charts-row" style="grid-template-columns: 1fr 1fr">
   <div class="chart-card">
     <div class="chart-header">
-      <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> Pr&eacute;diction de tendances</h3>
+      <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> Probabilit&eacute;s par classe</h3>
       <span class="chart-subtitle">Random Forest</span>
     </div>
     <div *ngIf="!trendsLoaded" style="text-align:center;padding:2rem;color:var(--text-muted)">
@@ -76,7 +76,7 @@
     <div *ngIf="trendsLoaded && trendsError" style="padding:1.5rem;color:var(--text-muted);font-size:.875rem">
       <i class="pi pi-exclamation-triangle" style="color:var(--warning)"></i> Service IA requis (port 8001).
     </div>
-    <div class="chart-body" *ngIf="trendsLoaded && !trendsError">
+    <div class="chart-body" style="height:320px" *ngIf="trendsLoaded && !trendsError">
       <canvas #trendChart></canvas>
     </div>
   </div>

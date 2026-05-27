@@ -78,48 +78,45 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     if (!this.trends.length) return;
 
     if (this.trendChartRef?.nativeElement) {
-      const labels = this.trends.map(t => t.domain);
-      const confidences = this.trends.map(t => t.confidence * 100);
-      const trendColors = this.trends.map((t: any) =>
-        t.trend === 'rising' ? '#22c55e' : t.trend === 'declining' ? '#ef4444' : '#f59e0b'
-      );
+      const labels = this.trends.map((t: any) => t.domain);
+      const risingData = this.trends.map((t: any) => ((t.probabilities?.rising || 0) * 100));
+      const stableData = this.trends.map((t: any) => ((t.probabilities?.stable || 0) * 100));
+      const decliningData = this.trends.map((t: any) => ((t.probabilities?.declining || 0) * 100));
 
       new Chart(this.trendChartRef.nativeElement, {
         type: 'bar',
         data: {
           labels,
-          datasets: [{
-            label: 'Confiance (%)',
-            data: confidences,
-            backgroundColor: trendColors,
-            borderRadius: 6,
-            borderSkipped: false,
-          }]
+          datasets: [
+            { label: 'En hausse', data: risingData, backgroundColor: '#22c55e', borderRadius: 2 },
+            { label: 'Stable', data: stableData, backgroundColor: '#f59e0b', borderRadius: 2 },
+            { label: 'En baisse', data: decliningData, backgroundColor: '#ef4444', borderRadius: 2 },
+          ]
         },
         options: {
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: false },
+            legend: {
+              position: 'bottom',
+              labels: { usePointStyle: true, pointStyle: 'circle', padding: 12, font: { size: 10 } }
+            },
             tooltip: {
               callbacks: {
-                label: (ctx: any) => {
-                  const t = this.trends[ctx.dataIndex];
-                  const label = t.trend === 'rising' ? 'En hausse' : t.trend === 'declining' ? 'En baisse' : 'Stable';
-                  return label + ' — ' + ctx.raw.toFixed(1) + '% confiance';
-                }
+                label: (ctx: any) => ctx.dataset.label + ' : ' + ctx.raw.toFixed(1) + '%'
               }
             }
           },
           scales: {
             x: {
-              min: 0, max: 100,
+              stacked: true, min: 0, max: 100,
               grid: { color: '#f1f5f9' },
-              ticks: { callback: (v: any) => v + '%', font: { size: 11 } }
+              ticks: { callback: (v: any) => v + '%', font: { size: 10 } }
             },
             y: {
-              ticks: { font: { size: 11 } },
+              stacked: true,
+              ticks: { font: { size: 10 } },
               grid: { display: false }
             }
           }

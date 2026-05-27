@@ -1,73 +1,86 @@
-<div class="flex justify-content-center align-items-center min-h-screen">
-  <p-card class="w-full" [style]="{ 'max-width': '400px' }">
-    <ng-template pTemplate="header">
-      <div class="text-center p-4">
-        <h1 class="text-2xl font-bold">IA-Technology</h1>
-        <p class="text-gray-600">Créer un compte</p>
-      </div>
-    </ng-template>
+<div class="auth-page">
+  <a routerLink="/" class="back-home-btn"><i class="pi pi-arrow-left"></i> Retour &agrave; l'accueil</a>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-column gap-3">
-      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage"></p-message>
+  <h1 style="font-size:1.75rem;font-weight:800;margin-bottom:.25rem">IA Research Hub</h1>
+  <p class="auth-subtitle">The Precision Curator of Scientific Excellence</p>
 
-      <div class="flex flex-column gap-2">
-        <label for="username" class="font-semibold">Nom d'utilisateur</label>
-        <input
-          pInputText
-          id="username"
-          type="text"
-          formControlName="username"
-          placeholder="votre_nom"
-          [class.ng-invalid]="username?.invalid && username?.touched"
-        />
-        <small class="text-red-500" *ngIf="username?.invalid && username?.touched">
-          {{ username?.errors?.['required'] ? 'Requis' : 'Min 3 caractères' }}
-        </small>
+  <div class="auth-card">
+    <h2>Cr&eacute;er un compte</h2>
+    <p class="auth-desc">Rejoignez la communaut&eacute; des chercheurs d'&eacute;lite.</p>
+
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <div class="form-input-icon">
+          <i class="pi pi-user"></i>
+          <input class="form-input" type="text" [(ngModel)]="username" name="username"
+                 placeholder="Jean Dupont" required />
+        </div>
       </div>
 
-      <div class="flex flex-column gap-2">
-        <label for="email" class="font-semibold">Email</label>
-        <input
-          pInputText
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="votre@email.com"
-          [class.ng-invalid]="email?.invalid && email?.touched"
-        />
-        <small class="text-red-500" *ngIf="email?.invalid && email?.touched">
-          {{ email?.errors?.['required'] ? 'Email requis' : 'Email invalide' }}
-        </small>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <div class="form-input-icon">
+          <i class="pi pi-envelope"></i>
+          <input class="form-input" type="email" [(ngModel)]="email" name="email"
+                 placeholder="recherche&#64;ia-tech.fr" required />
+        </div>
       </div>
 
-      <div class="flex flex-column gap-2">
-        <label for="password" class="font-semibold">Mot de passe</label>
-        <input
-          pInputText
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="••••••"
-          [class.ng-invalid]="password?.invalid && password?.touched"
-        />
-        <small class="text-red-500" *ngIf="password?.invalid && password?.touched">
-          {{ password?.errors?.['required'] ? 'Requis' : 'Min 6 caractères' }}
-        </small>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="form-input-icon">
+          <i class="pi pi-lock"></i>
+          <input class="form-input" type="password" [(ngModel)]="password" name="password"
+                 placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required />
+        </div>
       </div>
 
-      <p-button
-        type="submit"
-        label="S'inscrire"
-        [loading]="loading"
-        [disabled]="form.invalid || loading"
-        class="w-full"
-      ></p-button>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <div class="form-input-icon">
+          <i class="pi pi-shield"></i>
+          <input class="form-input" type="password" [(ngModel)]="confirmPassword" name="confirmPassword"
+                 placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required />
+        </div>
+      </div>
+
+      <button type="submit" class="auth-submit" [disabled]="loading">
+        {{ loading ? 'Inscription...' : "S'inscrire" }}
+      </button>
     </form>
 
-    <ng-template pTemplate="footer">
-      <div class="text-center">
-        <p class="text-sm">Déjà inscrit ? <a routerLink="/auth/login" class="text-blue-500 font-semibold">Se connecter</a></p>
+    <div class="auth-divider"></div>
+
+    <p class="auth-footer-link">
+      D&eacute;j&agrave; membre ? <a routerLink="/auth/login">Connectez-vous</a>
+    </p>
+  </div>
+
+  <div style="display:flex;gap:1.5rem;margin-top:2rem">
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1.5rem;border:1px solid var(--surface-border);border-radius:var(--radius-lg);background:var(--surface)">
+      <i class="pi pi-file" style="font-size:1.25rem;color:var(--primary)"></i>
+      <div>
+        <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)">Acc&egrave;s Direct</div>
+        <div style="font-size:.875rem;font-weight:500;color:var(--text-secondary)">+10k Publications</div>
       </div>
-    </ng-template>
-  </p-card>
+    </div>
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem 1.5rem;border:1px solid var(--surface-border);border-radius:var(--radius-lg);background:var(--surface)">
+      <i class="pi pi-users" style="font-size:1.25rem;color:var(--danger)"></i>
+      <div>
+        <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)">Network</div>
+        <div style="font-size:.875rem;font-weight:500;color:var(--text-secondary)">500+ Chercheurs</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-page-footer">
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+    <div class="footer-brand">&copy; 2024 IA-Technology Research Hub. Editorial Excellence in Science.</div>
+  </div>
 </div>

@@ -1,68 +1,145 @@
-<div class="py-8">
-  <!-- Hero Section -->
-  <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-12 mb-8 text-center">
-    <h1 class="text-4xl font-bold mb-4">IA-Technology</h1>
-    <p class="text-xl mb-6">Plateforme de gestion des travaux scientifiques</p>
+<!-- Hero -->
+<section class="hero-section">
+  <h1>D&eacute;couvrez les travaux de<br>recherche en IA</h1>
+  <p>Explorez les derni&egrave;res avanc&eacute;es en intelligence artificielle &agrave; travers notre collection de publications, chercheurs et domaines de recherche.</p>
 
-    <div class="flex justify-content-center gap-2 mb-6">
-      <p-inputGroup class="w-full" [style]="{ 'max-width': '500px' }">
-        <input
-          pInputText
-          type="text"
-          [(ngModel)]="searchQuery"
-          (keyup.enter)="onSearch()"
-          placeholder="Rechercher des publications..."
-        />
-        <p-button
-          icon="pi pi-search"
-          (onClick)="onSearch()"
-          [text]="true"
-        ></p-button>
-      </p-inputGroup>
+  <div class="hero-search">
+    <i class="pi pi-search"></i>
+    <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()"
+           placeholder="Rechercher des publications, chercheurs ou domaines..." />
+  </div>
+</section>
+
+<!-- Q&A Section -->
+<section class="container" style="margin-bottom:3rem">
+  <div class="qa-section">
+    <div class="qa-header">
+      <div class="qa-icon"><i class="pi pi-bolt"></i></div>
+      <div>
+        <h2>Posez une question &agrave; l'IA</h2>
+        <p>Notre IA analyse toutes les publications pour trouver la r&eacute;ponse la plus pertinente.</p>
+      </div>
     </div>
 
-    <div class="flex justify-content-center gap-3">
-      <p-button
-        label="Voir toutes les publications"
-        routerLink="/user/search"
-        [outlined]="true"
-      ></p-button>
+    <div *ngIf="isLoggedIn" class="qa-input-wrap">
+      <i class="pi pi-question-circle"></i>
+      <input type="text" [(ngModel)]="qaQuestion" (keyup.enter)="askQuestion()"
+             placeholder="Ex: What is deep learning? Quels sont les biais algorithmiques ?" />
+      <button class="btn btn-primary" (click)="askQuestion()" [disabled]="loadingQa">
+        {{ loadingQa ? 'Recherche...' : 'Demander' }}
+      </button>
+    </div>
+
+    <div *ngIf="!isLoggedIn" class="qa-login-prompt">
+      <i class="pi pi-lock"></i>
+      <span>Connectez-vous pour poser des questions &agrave; l'IA.</span>
+      <a routerLink="/auth/login" class="btn btn-sm btn-primary">Se connecter</a>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loadingQa" class="qa-loading">
+      <i class="pi pi-spin pi-spinner"></i> Analyse des publications en cours...
+    </div>
+
+    <!-- Results -->
+    <div *ngIf="!loadingQa && qaResults.length > 0" class="qa-results">
+      <div *ngFor="let r of qaResults" class="qa-card">
+        <div class="qa-answer" *ngIf="r.answer">
+          <i class="pi pi-bolt"></i>
+          <p>{{ r.answer }}</p>
+        </div>
+        <a [routerLink]="['/publications', r.id]" class="qa-source">
+          <span class="badge badge-primary">{{ r.domainName }}</span>
+          <strong>{{ r.title }}</strong>
+          <span class="qa-score">{{ getScorePercent(r.score) }}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- No results -->
+    <div *ngIf="!loadingQa && qaSearched && qaResults.length === 0" class="qa-empty">
+      <i class="pi pi-info-circle"></i> Aucune r&eacute;ponse trouv&eacute;e. Reformulez votre question ou v&eacute;rifiez que le service IA est actif.
     </div>
   </div>
+</section>
 
-  <!-- Recent Publications -->
-  <div class="mb-8">
-    <h2 class="text-3xl font-bold mb-4">Publications Récentes</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div *ngFor="let pub of publications" class="border rounded-lg p-4 shadow-sm">
-        <div class="bg-gray-100 p-3 mb-3 rounded text-center">
-          <p class="text-sm text-gray-600 m-0">{{ pub.domainName }}</p>
-        </div>
-        <h5 class="font-bold mb-2">{{ pub.title }}</h5>
-        <p class="text-sm text-gray-600 mb-3">{{ pub.abstract_ | slice:0:100 }}...</p>
-        <p class="text-xs text-gray-500 mb-3">Par: {{ pub.researcherName }}</p>
-        <p-button
-          label="Voir plus"
-          [text]="true"
-          icon="pi pi-arrow-right"
-          iconPos="right"
-        ></p-button>
+<!-- News & Announcements -->
+<section class="container" style="margin-bottom:3rem">
+  <div class="section-header">
+    <h2>Actualit&eacute;s & Annonces</h2>
+    <span class="section-badge">{{ featuredNewsList.length }} &agrave; la une</span>
+  </div>
+
+  <div *ngIf="featuredNewsList.length === 0" class="no-news">
+    <i class="pi pi-info-circle"></i> Aucune actualit&eacute; &agrave; la une pour le moment.
+  </div>
+
+  <div *ngIf="mainFeatured" class="featured-news" [style.backgroundImage]="mainFeatured.imageUrl ? 'url(http://localhost:8080/uploads/' + mainFeatured.imageUrl + ')' : 'none'">
+    <div class="featured-overlay">
+      <span class="featured-badge"><i class="pi pi-star-fill"></i> &Agrave; la une</span>
+      <h3>{{ mainFeatured.title }}</h3>
+      <p>{{ mainFeatured.content | slice:0:200 }}{{ mainFeatured.content?.length > 200 ? '...' : '' }}</p>
+      <div class="featured-meta">
+        <span><i class="pi pi-user"></i> {{ mainFeatured.authorUsername }}</span>
+        <span><i class="pi pi-calendar"></i> {{ mainFeatured.createdAt | date:'dd MMM yyyy' }}</span>
       </div>
     </div>
   </div>
 
-  <!-- News Section -->
-  <div class="mb-8">
-    <h2 class="text-3xl font-bold mb-4">Actualités</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div *ngFor="let item of news" class="border rounded-lg p-4 shadow-sm">
-        <div class="bg-blue-100 p-3 mb-3 rounded text-center">
-          <span *ngIf="item.featured" class="text-xs bg-green-500 text-white px-2 py-1 rounded">À la une</span>
+  <div class="news-grid" *ngIf="otherFeatured.length > 0">
+    <div *ngFor="let n of otherFeatured" class="news-card">
+      <div class="news-img">
+        <img *ngIf="n.imageUrl" [src]="'http://localhost:8080/uploads/' + n.imageUrl" [alt]="n.title" />
+        <div *ngIf="!n.imageUrl" class="news-img-placeholder">
+          <i class="pi pi-megaphone"></i>
         </div>
-        <h5 class="font-bold mb-2">{{ item.title }}</h5>
-        <p class="text-sm text-gray-600 mb-3">{{ item.content | slice:0:100 }}...</p>
-        <p class="text-xs text-gray-500">Par: {{ item.authorUsername }}</p>
+      </div>
+      <div class="news-body">
+        <div class="news-date"><i class="pi pi-calendar"></i> {{ n.createdAt | date:'dd MMM yyyy' }}</div>
+        <h4>{{ n.title }}</h4>
+        <p>{{ n.content | slice:0:120 }}{{ n.content?.length > 120 ? '...' : '' }}</p>
+        <div class="news-author"><i class="pi pi-user"></i> {{ n.authorUsername }}</div>
       </div>
     </div>
   </div>
-</div>
+</section>
+
+<!-- Domains -->
+<section class="container" style="margin-bottom:3rem">
+  <div class="section-header">
+    <h2>Domaines de recherche</h2>
+  </div>
+  <div class="domain-grid">
+    <div *ngFor="let d of domains" class="domain-card" [routerLink]="'/search'" [queryParams]="{domain: d.id}">
+      <div class="dc-category">{{ d.category || 'Recherche' }}</div>
+      <h3>{{ d.name }}</h3>
+      <p>{{ d.description | slice:0:120 }}{{ d.description?.length > 120 ? '...' : '' }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Publications à la une -->
+<section class="container" style="margin-bottom:3rem">
+  <div class="section-header">
+    <h2>Publications &agrave; la une</h2>
+    <a routerLink="/search" class="btn btn-sm btn-outline">Voir tout</a>
+  </div>
+  <div *ngIf="featuredPublications.length === 0" class="no-news">
+    <i class="pi pi-info-circle"></i> Aucune publication mise en avant pour le moment.
+  </div>
+  <div class="pub-grid">
+    <div *ngFor="let p of featuredPublications" class="pub-card">
+      <div class="pub-meta">
+        <span class="pub-domain">{{ p.domainName }}</span>
+        <span class="pub-date">{{ p.publishedDate | date:'dd MMM yyyy' }}</span>
+      </div>
+      <h4>{{ p.title }}</h4>
+      <div class="pub-author"><i class="pi pi-user" style="font-size:.75rem"></i> {{ p.researcherName }}</div>
+      <p class="pub-abstract">{{ p.abstractText || p.abstract_ }}</p>
+      <div class="pub-actions">
+        <a [routerLink]="['/publications', p.id]"><i class="pi pi-arrow-right"></i> Lire</a>
+        <button *ngIf="p.filePath"><i class="pi pi-file-pdf"></i> PDF</button>
+      </div>
+    </div>
+  </div>
+</section>

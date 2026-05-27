@@ -16,10 +16,12 @@ public class DomainService {
     private final DomainRepository domainRepository;
     private final AuditLogService auditLogService;
 
+    @Transactional(readOnly = true)
     public List<DomainDTO> getAll() {
         return domainRepository.findAll().stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public DomainDTO getById(Long id) {
         return domainRepository.findById(id)
                 .map(this::toDTO)

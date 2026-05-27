@@ -53,22 +53,22 @@ public class PublicationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create a new publication (ADMIN only)")
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATEUR')")
+    @Operation(summary = "Create a new publication (ADMIN or MODERATEUR)")
     public ResponseEntity<PublicationDTO> create(@Valid @RequestBody PublicationDTO dto, Authentication auth) {
         return ResponseEntity.status(HttpStatus.CREATED).body(publicationService.create(dto, auth.getName()));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update publication (ADMIN only)")
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATEUR')")
+    @Operation(summary = "Update publication (ADMIN or MODERATEUR)")
     public ResponseEntity<PublicationDTO> update(@PathVariable Long id, @Valid @RequestBody PublicationDTO dto, Authentication auth) {
         return ResponseEntity.ok(publicationService.update(id, dto, auth.getName()));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Delete publication (ADMIN only)")
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATEUR')")
+    @Operation(summary = "Delete publication (ADMIN or MODERATEUR)")
     public ResponseEntity<Void> delete(@PathVariable Long id, Authentication auth) {
         publicationService.delete(id, auth.getName());
         return ResponseEntity.noContent().build();

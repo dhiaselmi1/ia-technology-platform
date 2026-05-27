@@ -19,21 +19,25 @@ public class ResearcherService {
     private final DomainRepository domainRepository;
     private final AuditLogService auditLogService;
 
+    @Transactional(readOnly = true)
     public List<ResearcherDTO> getAll() {
         return researcherRepository.findAll().stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public ResearcherDTO getById(Long id) {
         return researcherRepository.findById(id)
                 .map(this::toDTO)
                 .orElseThrow(() -> new RuntimeException("Chercheur non trouvé"));
     }
 
+    @Transactional(readOnly = true)
     public List<ResearcherDTO> searchByName(String query) {
         return researcherRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(query, query)
                 .stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ResearcherDTO> getByDomain(Long domainId) {
         return researcherRepository.findByDomainId(domainId).stream().map(this::toDTO).toList();
     }

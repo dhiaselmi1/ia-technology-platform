@@ -51,6 +51,13 @@ public class UserController {
         return ResponseEntity.ok(userService.updateRole(id, role, auth.getName()));
     }
 
+    @PutMapping("/{id}/active")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Toggle user active status (ADMIN only)")
+    public ResponseEntity<UserDTO> toggleActive(@PathVariable Long id, @RequestParam boolean active, Authentication auth) {
+        return ResponseEntity.ok(userService.toggleActive(id, active, auth.getName()));
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Delete user (ADMIN only)")

@@ -1,98 +1,90 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { EditorModule } from 'primeng/editor';
-import { ToastModule } from 'primeng/toast';
-import { CheckboxModule } from 'primeng/checkbox';
-import { TagModule } from 'primeng/tag';
-import { MessageService } from 'primeng/api';
+import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, EditorModule, ToastModule, CheckboxModule, TagModule],
-  providers: [MessageService],
-  templateUrl: './news.component.html'
+  imports: [CommonModule, FormsModule],
+  templateUrl: './news.component.html',
+  styleUrl: './news.component.scss'
 })
 export class NewsComponent implements OnInit {
-  private apiService = inject(ApiService);
-  private messageService = inject(MessageService);
-  private fb = inject(FormBuilder);
+  private api = inject(ApiService);
 
   news: any[] = [];
-  displayDialog = false;
-  form: FormGroup;
-  loading = false;
+  showDialog = false;
   editingId: number | null = null;
+  form = { title: '', content: '', imageUrl: '', featured: false };
 
-  constructor() {
-    this.form = this.fb.group({
-      title: ['', Validators.required],
-      content: ['', Validators.required],
-      imageUrl: [''],
-      featured: [false]
-    });
+  uploading = false;
+  uploadPreview: string | null = null;
+
+  ngOnInit(): void { this.load(); }
+
+  load(): void {
+    this.api.get<any[]>('news').subscribe(r => this.news = r || []);
   }
 
-  ngOnInit(): void {
-    this.loadNews();
-  }
-
-  loadNews(): void {
-    this.apiService.get<any>('news').subscribe({
-      next: (res: any) => this.news = res || [],
-      error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger' })
-    });
-  }
-
-  openDialog(): void {
+  openNew(): void {
     this.editingId = null;
-    this.form.reset();
-    this.displayDialog = true;
+    this.form = { title: '', content: '', imageUrl: '', featured: false };
+    this.uploadPreview = null;
+    this.showDialog = true;
   }
 
-  editNews(item: any): void {
+  edit(item: any): void {
     this.editingId = item.id;
-    this.form.patchValue(item);
-    this.displayDialog = true;
+    this.form = { title: item.title, content: item.content || '', imageUrl: item.imageUrl || '', featured: item.featured || false };
+    this.uploadPreview = item.imageUrl ? 'http://localhost:8080/uploads/' + item.imageUrl : null;
+    this.showDialog = true;
   }
 
-  saveNews(): void {
-    if (this.form.invalid) return;
-    this.loading = true;
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
 
-    const request = this.editingId
-      ? this.apiService.put(`news/${this.editingId}`, this.form.value)
-      : this.apiService.post('news', this.form.value);
+    const reader = new FileReader();
+    reader.onload = () => this.uploadPreview = reader.result as string;
+    reader.readAsDataURL(file);
 
-    request.subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Actualité sauvegardée' });
-        this.displayDialog = false;
-        this.loadNews();
-        this.loading = false;
+    this.uploading = true;
+    const fd = new FormData();
+    fd.append('file', file);
+    this.api.upload<{ path: string }>('files/images', fd).subscribe({
+      next: (res) => {
+        this.form.imageUrl = res.path;
+        this.uploading = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de sauvegarder' });
-        this.loading = false;
+        this.uploading = false;
+        this.uploadPreview = null;
       }
     });
   }
 
-  deleteNews(id: number): void {
-    if (confirm('Êtes-vous sûr ?')) {
-      this.apiService.delete(`news/${id}`).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Actualité supprimée' });
-          this.loadNews();
-        },
-        error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de supprimer' })
-      });
+  removeImage(): void {
+    this.form.imageUrl = '';
+    this.uploadPreview = null;
+  }
+
+  save(): void {
+    const req = this.editingId
+      ? this.api.put(`news/${this.editingId}`, this.form)
+      : this.api.post('news', this.form);
+    req.subscribe({ next: () => { this.showDialog = false; this.load(); } });
+  }
+
+  delete(id: number): void {
+    if (confirm('Supprimer cette actualité ?')) {
+      this.api.delete(`news/${id}`).subscribe(() => this.load());
     }
+  }
+
+  toggleFeatured(item: any): void {
+    item.featured = !item.featured;
+    this.api.put(`news/${item.id}`, { title: item.title, content: item.content, imageUrl: item.imageUrl, featured: item.featured }).subscribe();
   }
 }

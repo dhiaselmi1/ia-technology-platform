@@ -1,53 +1,92 @@
-<div class="py-8">
-  <div class="flex justify-content-between align-items-center mb-4">
-    <h1 class="text-3xl font-bold">Gestion des Actualités</h1>
-    <p-button label="Ajouter" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+  <div>
+    <h1>Gestion des Actualit&eacute;s</h1>
+    <p>Cr&eacute;ez et g&eacute;rez les annonces de l'IA Research Hub.</p>
   </div>
+  <button class="btn btn-primary" (click)="openNew()"><i class="pi pi-plus"></i> Nouvelle actualit&eacute;</button>
+</div>
 
-  <p-table [value]="news" [paginator]="true" [rows]="10" responsiveLayout="scroll">
-    <ng-template pTemplate="header">
+<div class="data-card">
+  <table class="data-table">
+    <thead>
       <tr>
+        <th>Image</th>
         <th>Titre</th>
-        <th>À la une</th>
         <th>Auteur</th>
+        <th>&Agrave; la une</th>
+        <th>Date</th>
         <th>Actions</th>
       </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-item>
-      <tr>
-        <td>{{ item.title }}</td>
-        <td><p-tag [value]="item.featured ? 'Oui' : 'Non'" [severity]="item.featured ? 'success' : 'info'"></p-tag></td>
-        <td>{{ item.authorUsername }}</td>
+    </thead>
+    <tbody>
+      <tr *ngFor="let n of news">
+        <td style="width:64px">
+          <div class="table-thumb">
+            <img *ngIf="n.imageUrl" [src]="'http://localhost:8080/uploads/' + n.imageUrl" [alt]="n.title" />
+            <i *ngIf="!n.imageUrl" class="pi pi-image"></i>
+          </div>
+        </td>
+        <td><strong>{{ n.title }}</strong></td>
+        <td style="font-size:.8125rem;color:var(--text-secondary)">{{ n.authorUsername }}</td>
         <td>
-          <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" (onClick)="editNews(item)"></p-button>
-          <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteNews(item.id)"></p-button>
+          <button class="btn btn-sm" [class.btn-primary]="n.featured" [class.btn-outline]="!n.featured"
+                  (click)="toggleFeatured(n)">
+            {{ n.featured ? 'Oui' : 'Non' }}
+          </button>
+        </td>
+        <td style="font-size:.8125rem;color:var(--text-muted)">{{ n.createdAt | date:'dd MMM yyyy' }}</td>
+        <td>
+          <div style="display:flex;gap:.5rem">
+            <button class="btn btn-sm btn-outline" (click)="edit(n)"><i class="pi pi-pencil"></i></button>
+            <button class="btn btn-sm btn-outline" style="color:var(--danger)" (click)="delete(n.id)"><i class="pi pi-trash"></i></button>
+          </div>
         </td>
       </tr>
-    </ng-template>
-  </p-table>
+    </tbody>
+  </table>
+</div>
 
-  <p-dialog [(visible)]="displayDialog" header="Actualité" [modal]="true" [style]="{ width: '70vw' }">
-    <form [formGroup]="form" (ngSubmit)="saveNews()" class="flex flex-column gap-3">
-      <div class="flex flex-column gap-2">
-        <label>Titre</label>
-        <input pInputText formControlName="title" />
-      </div>
-      <div class="flex flex-column gap-2">
-        <label>Contenu</label>
-        <p-editor formControlName="content" [modules]="{ toolbar: [['bold', 'italic'], ['link']] }" [style]="{ height: '320px' }"></p-editor>
-      </div>
-      <div class="flex gap-3">
-        <div class="flex-1 flex flex-column gap-2">
-          <label>Image URL</label>
-          <input pInputText formControlName="imageUrl" />
-        </div>
-        <div class="flex align-items-end">
-          <p-checkbox formControlName="featured" label="À la une"></p-checkbox>
-        </div>
-      </div>
-      <p-button type="submit" label="Sauvegarder" [loading]="loading"></p-button>
-    </form>
-  </p-dialog>
+<!-- Dialog -->
+<div *ngIf="showDialog" class="dialog-backdrop" (click)="showDialog = false">
+  <div class="dialog-content" (click)="$event.stopPropagation()">
+    <h2 style="margin-bottom:1.5rem">{{ editingId ? 'Modifier' : 'Nouvelle' }} actualit&eacute;</h2>
+    <div class="form-group">
+      <label class="form-label">Titre</label>
+      <input class="form-input" [(ngModel)]="form.title" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contenu</label>
+      <textarea class="form-input" [(ngModel)]="form.content" rows="6" style="resize:vertical"></textarea>
+    </div>
 
-  <p-toast></p-toast>
+    <!-- Image upload -->
+    <div class="form-group">
+      <label class="form-label">Image</label>
+      <div class="upload-zone" *ngIf="!uploadPreview">
+        <input type="file" accept="image/*" (change)="onImageSelected($event)" id="newsImage" style="display:none" />
+        <label for="newsImage" class="upload-label">
+          <i class="pi pi-cloud-upload"></i>
+          <span>Cliquer pour choisir une image</span>
+          <small>JPG, PNG, GIF — max 5 Mo</small>
+        </label>
+      </div>
+      <div class="upload-preview" *ngIf="uploadPreview">
+        <img [src]="uploadPreview" alt="Preview" />
+        <div class="upload-preview-actions">
+          <span *ngIf="uploading" class="upload-status"><i class="pi pi-spin pi-spinner"></i> Upload en cours...</span>
+          <span *ngIf="!uploading && form.imageUrl" class="upload-status success"><i class="pi pi-check"></i> Image upload&eacute;e</span>
+          <button class="btn btn-sm btn-outline" style="color:var(--danger)" (click)="removeImage()"><i class="pi pi-trash"></i> Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <label class="remember-row">
+      <input type="checkbox" [(ngModel)]="form.featured" />
+      &Agrave; la une
+    </label>
+    <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1rem">
+      <button class="btn btn-outline" (click)="showDialog = false">Annuler</button>
+      <button class="btn btn-primary" [disabled]="uploading" (click)="save()">{{ editingId ? 'Modifier' : 'Publier' }}</button>
+    </div>
+  </div>
 </div>

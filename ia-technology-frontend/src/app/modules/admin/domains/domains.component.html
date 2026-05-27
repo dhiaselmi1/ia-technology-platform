@@ -1,46 +1,55 @@
-<div class="py-8">
-  <div class="flex justify-content-between align-items-center mb-4">
-    <h1 class="text-3xl font-bold">Gestion des Domaines</h1>
-    <p-button label="Ajouter" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+  <div>
+    <h1>Gestion des Domaines</h1>
+    <p>Organisez l'architecture de recherche par taxonomies pr&eacute;cises et domaines scientifiques strat&eacute;giques.</p>
   </div>
+  <button class="btn btn-primary" (click)="openNew()"><i class="pi pi-plus"></i> Nouveau domaine</button>
+</div>
 
-  <p-table [value]="domains" [paginator]="true" [rows]="10" responsiveLayout="scroll">
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Nom</th>
-        <th>Catégorie</th>
-        <th>Actions</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-domain>
-      <tr>
-        <td>{{ domain.name }}</td>
-        <td>{{ domain.category }}</td>
-        <td>
-          <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" (onClick)="editDomain(domain)"></p-button>
-          <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteDomain(domain.id)"></p-button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+<div style="margin-bottom:1.5rem">
+  <div style="position:relative;max-width:360px">
+    <i class="pi pi-search" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted)"></i>
+    <input class="form-input" [(ngModel)]="searchQuery" placeholder="Rechercher un domaine..."
+           style="padding-left:2.25rem" />
+  </div>
+</div>
 
-  <p-dialog [(visible)]="displayDialog" header="Domaine" [modal]="true" [style]="{ width: '50vw' }">
-    <form [formGroup]="form" (ngSubmit)="saveDomain()" class="flex flex-column gap-3">
-      <div class="flex flex-column gap-2">
-        <label>Nom</label>
-        <input pInputText formControlName="name" />
+<div class="domain-grid">
+  <div *ngFor="let d of filtered" class="domain-card">
+    <div class="dc-category">{{ d.category || 'Non classé' }}</div>
+    <h3>{{ d.name }}</h3>
+    <p>{{ d.description }}</p>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="dc-link">Voir publications</span>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-sm btn-ghost" (click)="edit(d)"><i class="pi pi-pencil"></i></button>
+        <button class="btn btn-sm btn-ghost" style="color:var(--danger)" (click)="delete(d.id)"><i class="pi pi-trash"></i></button>
       </div>
-      <div class="flex flex-column gap-2">
-        <label>Description</label>
-        <textarea pInputTextarea formControlName="description" rows="3"></textarea>
-      </div>
-      <div class="flex flex-column gap-2">
-        <label>Catégorie</label>
-        <input pInputText formControlName="category" />
-      </div>
-      <p-button type="submit" label="Sauvegarder" [loading]="loading"></p-button>
-    </form>
-  </p-dialog>
+    </div>
+  </div>
+</div>
 
-  <p-toast></p-toast>
+<!-- Dialog -->
+<div *ngIf="showDialog" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:flex;align-items:center;justify-content:center"
+     (click)="showDialog = false">
+  <div style="background:var(--surface);border-radius:var(--radius-lg);padding:2rem;width:480px;box-shadow:var(--shadow-lg)"
+       (click)="$event.stopPropagation()">
+    <h2 style="margin-bottom:1.5rem">{{ editingId ? 'Modifier' : 'Nouveau' }} domaine</h2>
+    <div class="form-group">
+      <label class="form-label">Nom</label>
+      <input class="form-input" [(ngModel)]="form.name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cat&eacute;gorie</label>
+      <input class="form-input" [(ngModel)]="form.category" placeholder="ex: TAXONOMIE ALPHA" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" [(ngModel)]="form.description" rows="4" style="resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1rem">
+      <button class="btn btn-outline" (click)="showDialog = false">Annuler</button>
+      <button class="btn btn-primary" (click)="save()">{{ editingId ? 'Modifier' : 'Cr&eacute;er' }}</button>
+    </div>
+  </div>
 </div>

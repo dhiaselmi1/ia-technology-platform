@@ -63,7 +63,7 @@ public class AuthService {
         return AuthResponse.builder()
                 .token(jwtTokenProvider.generateToken(user))
                 .role(user.getRole().name())
-                .username(user.getUsername())
+                .username(user.getDisplayName())
                 .email(user.getEmail())
                 .build();
     }

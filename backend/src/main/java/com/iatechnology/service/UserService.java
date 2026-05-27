@@ -19,10 +19,12 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
 
+    @Transactional(readOnly = true)
     public List<UserDTO> getAll() {
         return userRepository.findAll().stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public UserDTO getById(Long id) {
         return userRepository.findById(id)
                 .map(this::toDTO)
@@ -61,6 +63,16 @@ public class UserService {
     }
 
     @Transactional
+    public UserDTO toggleActive(Long id, boolean active, String adminEmail) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouve"));
+        user.setActive(active);
+        User updated = userRepository.save(user);
+        auditLogService.log("UPDATE", "User", id, adminEmail, "User active status set to " + active);
+        return toDTO(updated);
+    }
+
+    @Transactional
     public void delete(Long id, String adminEmail) {
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("Utilisateur non trouvé");
@@ -72,7 +84,7 @@ public class UserService {
     private UserDTO toDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())
-                .username(user.getUsername())
+                .username(user.getDisplayName())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .active(user.isActive())

@@ -1,0 +1,244 @@
+{
+  "info": {
+    "name": "IA-Technology API",
+    "description": "Collection Postman pour tester toutes les API de la plateforme IA-Technology (backend Spring Boot + FastAPI).\n\n**Pour démarrer :**\n1. Importer cette collection dans Postman.\n2. Exécuter `Auth / Login (admin)` → le token JWT est stocké automatiquement dans la variable `{{token}}`.\n3. Utiliser les autres requêtes : l'en-tête `Authorization: Bearer {{token}}` est pré-rempli.\n\nComptes de seed :\n- admin@ia-technology.com / admin123\n- moderator@ia-technology.com / moderator123\n- alice@example.com / user123",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "aiUrl", "value": "http://localhost:8001" },
+    { "key": "token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (utilisateur)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"new_user\",\n  \"email\": \"new_user@example.com\",\n  \"password\": \"password123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) { pm.collectionVariables.set('token', res.token); console.log('Token saved'); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@ia-technology.com\",\n  \"password\": \"admin123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login (moderator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["const res = pm.response.json(); if (res.token) pm.collectionVariables.set('token', res.token);"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"moderator@ia-technology.com\",\n  \"password\": \"moderator123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login (user)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["const res = pm.response.json(); if (res.token) pm.collectionVariables.set('token', res.token);"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"user123\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Domains",
+      "item": [
+        {
+          "name": "Get all domains (public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/domains", "host": ["{{baseUrl}}"], "path": ["domains"] } }
+        },
+        {
+          "name": "Get domain by id",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/domains/1", "host": ["{{baseUrl}}"], "path": ["domains", "1"] } }
+        },
+        {
+          "name": "Create domain (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Réalité Virtuelle\",\n  \"description\": \"VR/AR, interfaces immersives\",\n  \"category\": \"Informatique\"\n}" },
+            "url": { "raw": "{{baseUrl}}/domains", "host": ["{{baseUrl}}"], "path": ["domains"] }
+          }
+        },
+        {
+          "name": "Update domain (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Intelligence Artificielle Avancée\",\n  \"description\": \"IA, ML, deep learning\",\n  \"category\": \"Informatique\"\n}" },
+            "url": { "raw": "{{baseUrl}}/domains/1", "host": ["{{baseUrl}}"], "path": ["domains", "1"] }
+          }
+        },
+        {
+          "name": "Delete domain (ADMIN)",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/domains/6", "host": ["{{baseUrl}}"], "path": ["domains", "6"] } }
+        }
+      ]
+    },
+    {
+      "name": "Researchers",
+      "item": [
+        {
+          "name": "Get all researchers (public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/researchers", "host": ["{{baseUrl}}"], "path": ["researchers"] } }
+        },
+        {
+          "name": "Search by name",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/researchers/search?query=dhia", "host": ["{{baseUrl}}"], "path": ["researchers", "search"], "query": [{ "key": "query", "value": "dhia" }] } }
+        },
+        {
+          "name": "Create researcher (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"firstName\": \"Mohamed\",\n  \"lastName\": \"Test\",\n  \"email\": \"mtest@univ.tn\",\n  \"bio\": \"Chercheur test\",\n  \"domainId\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/researchers", "host": ["{{baseUrl}}"], "path": ["researchers"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Publications",
+      "item": [
+        {
+          "name": "Get all publications (public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/publications", "host": ["{{baseUrl}}"], "path": ["publications"] } }
+        },
+        {
+          "name": "Search publications",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/publications/search?query=transformer", "host": ["{{baseUrl}}"], "path": ["publications", "search"], "query": [{ "key": "query", "value": "transformer" }] } }
+        },
+        {
+          "name": "Create publication (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Nouvelle publication de test\",\n  \"abstractText\": \"Résumé de la publication de test pour vérifier le mapping abstract_.\",\n  \"doi\": \"10.1234/iat.2026.999\",\n  \"researcherId\": 1,\n  \"domainId\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/publications", "host": ["{{baseUrl}}"], "path": ["publications"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "News",
+      "item": [
+        {
+          "name": "Get all news (public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/news", "host": ["{{baseUrl}}"], "path": ["news"] } }
+        },
+        {
+          "name": "Get featured news",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/news/featured", "host": ["{{baseUrl}}"], "path": ["news", "featured"] } }
+        },
+        {
+          "name": "Create news (MODERATEUR)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Nouvelle annonce\",\n  \"content\": \"Contenu de l'annonce de test créée via Postman.\",\n  \"featured\": false\n}" },
+            "url": { "raw": "{{baseUrl}}/news", "host": ["{{baseUrl}}"], "path": ["news"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users (ADMIN)",
+      "item": [
+        {
+          "name": "Get all users",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] } }
+        },
+        {
+          "name": "Update user role",
+          "request": { "method": "PUT", "url": { "raw": "{{baseUrl}}/users/3/role?role=MODERATEUR", "host": ["{{baseUrl}}"], "path": ["users", "3", "role"], "query": [{ "key": "role", "value": "MODERATEUR" }] } }
+        }
+      ]
+    },
+    {
+      "name": "Search (global)",
+      "item": [
+        {
+          "name": "Recherche globale (q)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/search?q=deep", "host": ["{{baseUrl}}"], "path": ["search"], "query": [{ "key": "q", "value": "deep" }] } }
+        },
+        {
+          "name": "Recherche par domaine",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/search?domain=1", "host": ["{{baseUrl}}"], "path": ["search"], "query": [{ "key": "domain", "value": "1" }] } }
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "Extract keywords (authenticated)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/ai/keywords?text=Deep learning for medical image segmentation using U-Net and Transformer architectures&n=8",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "keywords"],
+              "query": [
+                { "key": "text", "value": "Deep learning for medical image segmentation using U-Net and Transformer architectures" },
+                { "key": "n", "value": "8" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Recommendations for publication 1",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/ai/recommend/1?topN=5", "host": ["{{baseUrl}}"], "path": ["ai", "recommend", "1"], "query": [{ "key": "topN", "value": "5" }] } }
+        },
+        {
+          "name": "[FastAPI direct] health",
+          "request": { "method": "GET", "url": { "raw": "{{aiUrl}}/health", "host": ["{{aiUrl}}"], "path": ["health"] } }
+        }
+      ]
+    }
+  ]
+}

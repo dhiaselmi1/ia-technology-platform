@@ -42,6 +42,10 @@ public class Publication {
     @JoinColumn(name = "domain_id", nullable = false)
     private Domain domain;
 
+    @Builder.Default
+    @Column(name = "is_featured", columnDefinition = "boolean default false")
+    private boolean featured = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -1,66 +1,139 @@
-<p-toolbar class="mb-4">
-  <ng-template pTemplate="left">
-    <h1 class="text-2xl font-bold m-0">
-      <a routerLink="/" class="text-color no-underline">IA-Technology</a>
-    </h1>
-  </ng-template>
+<!-- Auth pages: no navbar, no sidebar -->
+<ng-container *ngIf="isAuthRoute">
+  <router-outlet></router-outlet>
+</ng-container>
 
-  <ng-template pTemplate="right">
-    <div class="flex gap-2 align-items-center">
+<!-- Admin / Moderator layout: sidebar + topbar -->
+<ng-container *ngIf="showSidebar && !isAuthRoute">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <h2>
+          <span class="brand-dot"><i class="pi pi-bolt"></i></span>
+          Precision Curator
+        </h2>
+        <small>Admin Console</small>
+      </div>
+
+      <nav>
+        <!-- Admin links -->
+        <ng-container *ngIf="sidebarContext === 'admin'">
+          <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <i class="pi pi-th-large"></i> Dashboard
+          </a>
+          <a routerLink="/admin/researchers" routerLinkActive="active">
+            <i class="pi pi-users"></i> Researchers
+          </a>
+          <a routerLink="/admin/publications" routerLinkActive="active">
+            <i class="pi pi-file"></i> Publications
+          </a>
+          <a routerLink="/admin/domains" routerLinkActive="active">
+            <i class="pi pi-sitemap"></i> Domains
+          </a>
+          <a routerLink="/admin/users" routerLinkActive="active">
+            <i class="pi pi-id-card"></i> User Management
+          </a>
+          <a routerLink="/user" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <i class="pi pi-user"></i> Mon Profil
+          </a>
+        </ng-container>
+        <!-- Moderator links -->
+        <ng-container *ngIf="sidebarContext === 'moderator'">
+          <a routerLink="/moderator" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <i class="pi pi-megaphone"></i> Actualit&eacute;s
+          </a>
+          <a routerLink="/moderator/publications" routerLinkActive="active">
+            <i class="pi pi-file"></i> Publications
+          </a>
+          <a routerLink="/user" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <i class="pi pi-user"></i> Mon Profil
+          </a>
+          <a routerLink="/" >
+            <i class="pi pi-home"></i> Accueil
+          </a>
+        </ng-container>
+      </nav>
+
+      <div class="sidebar-cta">
+        <button (click)="navigateTo('/admin/publications')">
+          <i class="pi pi-plus"></i> New Publication
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <a routerLink="/"><i class="pi pi-question-circle"></i> Help Center</a>
+        <a class="danger" (click)="logout()" style="cursor:pointer"><i class="pi pi-sign-out"></i> Logout</a>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <div class="admin-content">
+      <div class="admin-topbar">
+        <div></div>
+        <div class="topbar-user">
+          <span style="font-size:.875rem;font-weight:500">{{ username }}</span>
+          <div class="avatar">{{ initials }}</div>
+        </div>
+      </div>
+      <div class="admin-main">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Public layout: navbar + content + footer -->
+<ng-container *ngIf="!showSidebar && !isAuthRoute">
+  <header class="public-navbar">
+    <a routerLink="/" class="nav-brand">
+      <span class="brand-icon"><i class="pi pi-bolt"></i></span>
+      IA Research Hub
+    </a>
+
+    <ul class="nav-links">
+      <li><a routerLink="/search" routerLinkActive="active">Publications</a></li>
+      <li><a routerLink="/researchers" routerLinkActive="active">Researchers</a></li>
+      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Domains</a></li>
+    </ul>
+
+    <div class="nav-actions">
       <ng-container *ngIf="isLoggedIn">
-        <span class="text-sm">{{ username }} ({{ userRole }})</span>
-        <p-button
-          *ngIf="userRole === 'ADMIN'"
-          icon="pi pi-cog"
-          [rounded]="true"
-          [text]="true"
-          routerLink="/admin"
-          pTooltip="Admin"
-          tooltipPosition="bottom"
-        ></p-button>
-        <p-button
-          *ngIf="userRole === 'MODERATEUR'"
-          icon="pi pi-pencil"
-          [rounded]="true"
-          [text]="true"
-          routerLink="/moderator"
-          pTooltip="Modérateur"
-          tooltipPosition="bottom"
-        ></p-button>
-        <p-button
-          icon="pi pi-user"
-          [rounded]="true"
-          [text]="true"
-          routerLink="/user"
-          pTooltip="Profil"
-          tooltipPosition="bottom"
-        ></p-button>
-        <p-button
-          icon="pi pi-sign-out"
-          [rounded]="true"
-          [text]="true"
-          (onClick)="logout()"
-          pTooltip="Déconnexion"
-          tooltipPosition="bottom"
-        ></p-button>
+        <button *ngIf="userRole === 'ADMIN'" class="btn btn-sm btn-outline" routerLink="/admin">
+          <i class="pi pi-cog"></i> Admin
+        </button>
+        <button *ngIf="userRole === 'MODERATEUR'" class="btn btn-sm btn-outline" routerLink="/moderator">
+          <i class="pi pi-pencil"></i> Moderator
+        </button>
+        <a routerLink="/user" class="nav-user-link">
+          <div class="avatar-sm">{{ initials }}</div>
+          <span>{{ username }}</span>
+        </a>
+        <button class="btn btn-sm btn-ghost" (click)="logout()">
+          <i class="pi pi-sign-out"></i>
+        </button>
       </ng-container>
 
       <ng-container *ngIf="!isLoggedIn">
-        <p-button
-          label="Connexion"
-          routerLink="/auth/login"
-          [text]="true"
-        ></p-button>
-        <p-button
-          label="S'inscrire"
-          routerLink="/auth/register"
-          [outlined]="true"
-        ></p-button>
+        <button class="btn btn-sm btn-ghost" routerLink="/auth/login">Login</button>
+        <button class="btn btn-sm btn-primary" routerLink="/auth/register">Register</button>
       </ng-container>
     </div>
-  </ng-template>
-</p-toolbar>
+  </header>
 
-<div class="container mx-auto px-4">
-  <router-outlet></router-outlet>
-</div>
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <span class="footer-copy">&copy; 2024 IA-Technology Research Hub. Editorial Excellence in Science.</span>
+      <nav class="footer-nav">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Contact Support</a>
+        <a href="#">API Documentation</a>
+      </nav>
+    </div>
+  </footer>
+</ng-container>

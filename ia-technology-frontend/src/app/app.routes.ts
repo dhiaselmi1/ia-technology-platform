@@ -8,6 +8,18 @@ export const routes: Routes = [
     loadChildren: () => import('./modules/public/public.routes').then(m => m.PUBLIC_ROUTES)
   },
   {
+    path: 'search',
+    loadComponent: () => import('./modules/user/search/search.component').then(m => m.SearchComponent)
+  },
+  {
+    path: 'researchers',
+    loadComponent: () => import('./modules/public/researchers-list/researchers-list.component').then(m => m.ResearchersListComponent)
+  },
+  {
+    path: 'publications/:id',
+    loadComponent: () => import('./modules/public/publication-detail/publication-detail.component').then(m => m.PublicationDetailComponent)
+  },
+  {
     path: 'auth',
     loadChildren: () => import('./modules/auth/auth.routes').then(m => m.AUTH_ROUTES)
   },

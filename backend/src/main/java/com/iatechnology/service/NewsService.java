@@ -19,14 +19,17 @@ public class NewsService {
     private final UserRepository userRepository;
     private final AuditLogService auditLogService;
 
+    @Transactional(readOnly = true)
     public List<NewsDTO> getAll() {
         return newsRepository.findAllByOrderByCreatedAtDesc().stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<NewsDTO> getFeatured() {
         return newsRepository.findByFeaturedTrueOrderByCreatedAtDesc().stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public NewsDTO getById(Long id) {
         return newsRepository.findById(id)
                 .map(this::toDTO)

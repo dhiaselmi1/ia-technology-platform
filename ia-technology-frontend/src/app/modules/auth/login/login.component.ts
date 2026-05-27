@@ -1,54 +1,56 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { CardModule } from 'primeng/card';
-import { MessageModule } from 'primeng/message';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, InputTextModule, CardModule, MessageModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
-  private fb = inject(FormBuilder);
+export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  form: FormGroup;
+  email = '';
+  password = '';
+  rememberMe = false;
+  showPassword = false;
   loading = false;
-  errorMessage = '';
+  error = '';
 
-  constructor() {
-    this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
+  ngOnInit(): void {
+    const saved = localStorage.getItem('iat_remember');
+    if (saved) {
+      const data = JSON.parse(saved);
+      this.email = data.email || '';
+      this.password = data.password || '';
+      this.rememberMe = true;
+    }
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
-
+    if (!this.email || !this.password) return;
     this.loading = true;
-    this.errorMessage = '';
+    this.error = '';
 
-    this.authService.login(this.form.value).subscribe({
-      next: (res) => {
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
+      next: () => {
+        if (this.rememberMe) {
+          localStorage.setItem('iat_remember', JSON.stringify({ email: this.email, password: this.password }));
+        } else {
+          localStorage.removeItem('iat_remember');
+        }
         this.loading = false;
         this.router.navigate(['/']);
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err.error?.error || 'Erreur de connexion';
+        this.error = err.error?.message || 'Email ou mot de passe incorrect';
       }
     });
   }
-
-  get email() { return this.form.get('email'); }
-  get password() { return this.form.get('password'); }
 }

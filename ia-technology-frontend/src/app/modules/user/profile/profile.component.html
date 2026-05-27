@@ -1,0 +1,120 @@
+<div class="profile-container">
+  <div class="page-header">
+    <h1>Mon Profil</h1>
+    <p>G&eacute;rez vos informations personnelles et votre s&eacute;curit&eacute;.</p>
+  </div>
+
+  <div *ngIf="loading" style="text-align:center;padding:3rem;color:var(--text-muted)">
+    <i class="pi pi-spin pi-spinner" style="font-size:2rem"></i>
+  </div>
+
+  <ng-container *ngIf="!loading && profile">
+    <!-- Profile card -->
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">{{ getInitials() }}</div>
+        <div class="profile-info">
+          <h2>{{ profile.username }}</h2>
+          <p>{{ profile.email }}</p>
+          <span [class]="getRoleBadgeClass()">{{ getRoleLabel() }}</span>
+        </div>
+        <button *ngIf="!editMode" class="btn btn-outline" (click)="startEdit()">
+          <i class="pi pi-pencil"></i> Modifier
+        </button>
+      </div>
+
+      <!-- Success message -->
+      <div *ngIf="editSuccess" class="alert alert-success">
+        <i class="pi pi-check-circle"></i> {{ editSuccess }}
+      </div>
+
+      <!-- View mode -->
+      <div *ngIf="!editMode" class="profile-details">
+        <div class="detail-row">
+          <div class="detail-label"><i class="pi pi-user"></i> Nom d'utilisateur</div>
+          <div class="detail-value">{{ profile.username }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label"><i class="pi pi-envelope"></i> Adresse e-mail</div>
+          <div class="detail-value">{{ profile.email }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label"><i class="pi pi-shield"></i> R&ocirc;le</div>
+          <div class="detail-value"><span [class]="getRoleBadgeClass()">{{ getRoleLabel() }}</span></div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label"><i class="pi pi-calendar"></i> Membre depuis</div>
+          <div class="detail-value">{{ profile.createdAt | date:'dd MMMM yyyy' }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label"><i class="pi pi-circle-fill" [style.color]="profile.active ? 'var(--success)' : 'var(--danger)'" style="font-size:.5rem"></i> Statut</div>
+          <div class="detail-value">{{ profile.active ? 'Actif' : 'Inactif' }}</div>
+        </div>
+      </div>
+
+      <!-- Edit mode -->
+      <div *ngIf="editMode" class="profile-edit">
+        <div *ngIf="editError" class="alert alert-error">
+          <i class="pi pi-exclamation-circle"></i> {{ editError }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom d'utilisateur</label>
+          <input class="form-input" [(ngModel)]="editForm.username" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Adresse e-mail</label>
+          <input class="form-input" type="email" [(ngModel)]="editForm.email" />
+        </div>
+        <div class="edit-actions">
+          <button class="btn btn-outline" (click)="cancelEdit()">Annuler</button>
+          <button class="btn btn-primary" [disabled]="saving" (click)="saveProfile()">
+            <i *ngIf="saving" class="pi pi-spin pi-spinner"></i>
+            {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password section -->
+    <div class="profile-card">
+      <div class="profile-header">
+        <div>
+          <h3 style="font-size:1.125rem;font-weight:600"><i class="pi pi-lock" style="margin-right:.5rem"></i> S&eacute;curit&eacute;</h3>
+          <p style="font-size:.8125rem;color:var(--text-muted);margin-top:.25rem">G&eacute;rez votre mot de passe</p>
+        </div>
+        <button class="btn btn-outline" (click)="togglePasswordForm()">
+          <i class="pi" [class.pi-chevron-down]="!showPasswordForm" [class.pi-chevron-up]="showPasswordForm"></i>
+          {{ showPasswordForm ? 'Fermer' : 'Changer le mot de passe' }}
+        </button>
+      </div>
+
+      <div *ngIf="showPasswordForm" class="password-form">
+        <div *ngIf="passwordError" class="alert alert-error">
+          <i class="pi pi-exclamation-circle"></i> {{ passwordError }}
+        </div>
+        <div *ngIf="passwordSuccess" class="alert alert-success">
+          <i class="pi pi-check-circle"></i> {{ passwordSuccess }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe actuel</label>
+          <input class="form-input" type="password" [(ngModel)]="passwordForm.currentPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nouveau mot de passe</label>
+          <input class="form-input" type="password" [(ngModel)]="passwordForm.newPassword" placeholder="Min. 6 caract&egrave;res" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmer le nouveau mot de passe</label>
+          <input class="form-input" type="password" [(ngModel)]="passwordForm.confirmPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" />
+        </div>
+        <div class="edit-actions">
+          <button class="btn btn-outline" (click)="togglePasswordForm()">Annuler</button>
+          <button class="btn btn-primary" [disabled]="savingPassword" (click)="changePassword()">
+            <i *ngIf="savingPassword" class="pi pi-spin pi-spinner"></i>
+            {{ savingPassword ? 'Modification...' : 'Modifier le mot de passe' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

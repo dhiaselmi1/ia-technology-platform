@@ -1,56 +1,110 @@
-<div class="py-8">
-  <div class="flex justify-content-between align-items-center mb-4">
-    <h1 class="text-3xl font-bold">Gestion des Chercheurs</h1>
-    <p-button label="Ajouter" icon="pi pi-plus" (onClick)="openDialog()"></p-button>
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+  <div>
+    <h1>Gestion des Chercheurs</h1>
+    <p>G&eacute;rez le r&eacute;pertoire acad&eacute;mique et les attributions des domaines de recherche.</p>
   </div>
+  <div style="display:flex;gap:.75rem">
+    <div style="position:relative">
+      <i class="pi pi-search" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted)"></i>
+      <input class="form-input" [(ngModel)]="searchQuery" placeholder="Rechercher un chercheur ou un domaine..."
+             style="padding-left:2.25rem;width:300px" />
+    </div>
+    <button class="btn btn-primary" (click)="openNew()"><i class="pi pi-plus"></i> Ajouter un chercheur</button>
+  </div>
+</div>
 
-  <p-table [value]="researchers" [paginator]="true" [rows]="10" responsiveLayout="scroll">
-    <ng-template pTemplate="header">
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Chercheurs</div>
+    <div class="kpi-value">{{ researchers.length }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Domaines Actifs</div>
+    <div class="kpi-value">{{ domains.length }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Articles Publi&eacute;s</div>
+    <div class="kpi-value">--</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Taux de Citation</div>
+    <div class="kpi-value">--</div>
+  </div>
+</div>
+
+<div class="data-card">
+  <div class="card-header">
+    <h3>R&eacute;pertoire des Chercheurs</h3>
+  </div>
+  <table class="data-table">
+    <thead>
       <tr>
-        <th>Nom</th>
-        <th>Email</th>
+        <th>Photo</th>
+        <th>Nom & Contact</th>
         <th>Domaine</th>
+        <th>Statut</th>
         <th>Actions</th>
       </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-researcher>
-      <tr>
-        <td>{{ researcher.firstName }} {{ researcher.lastName }}</td>
-        <td>{{ researcher.email }}</td>
-        <td>{{ researcher.domainName }}</td>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of filtered">
         <td>
-          <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" (onClick)="editResearcher(researcher)"></p-button>
-          <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteResearcher(researcher.id)"></p-button>
+          <div class="avatar">
+            <img *ngIf="r.photoUrl" [src]="r.photoUrl" [alt]="r.firstName" />
+            <span *ngIf="!r.photoUrl">{{ getInitials(r) }}</span>
+          </div>
+        </td>
+        <td>
+          <strong>Dr. {{ r.firstName }} {{ r.lastName }}</strong>
+          <div style="font-size:.75rem;color:var(--text-muted)">{{ r.email }}</div>
+        </td>
+        <td><span class="badge badge-primary">{{ r.domainName }}</span></td>
+        <td><span class="status-dot active">Actif</span></td>
+        <td>
+          <div style="display:flex;gap:.5rem">
+            <button class="btn btn-sm btn-outline" (click)="edit(r)"><i class="pi pi-pencil"></i></button>
+            <button class="btn btn-sm btn-outline" style="color:var(--danger)" (click)="delete(r.id)"><i class="pi pi-trash"></i></button>
+          </div>
         </td>
       </tr>
-    </ng-template>
-  </p-table>
+    </tbody>
+  </table>
+</div>
 
-  <p-dialog [(visible)]="displayDialog" header="Chercheur" [modal]="true" [style]="{ width: '50vw' }">
-    <form [formGroup]="form" (ngSubmit)="saveResearcher()" class="flex flex-column gap-3">
-      <div class="flex flex-column gap-2">
-        <label>Prénom</label>
-        <input pInputText formControlName="firstName" />
+<!-- Dialog -->
+<div *ngIf="showDialog" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:flex;align-items:center;justify-content:center"
+     (click)="showDialog = false">
+  <div style="background:var(--surface);border-radius:var(--radius-lg);padding:2rem;width:480px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)"
+       (click)="$event.stopPropagation()">
+    <h2 style="margin-bottom:1.5rem">{{ editingId ? 'Modifier' : 'Ajouter' }} un chercheur</h2>
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Pr&eacute;nom</label>
+        <input class="form-input" [(ngModel)]="form.firstName" />
       </div>
-      <div class="flex flex-column gap-2">
-        <label>Nom</label>
-        <input pInputText formControlName="lastName" />
+      <div class="form-group">
+        <label class="form-label">Nom</label>
+        <input class="form-input" [(ngModel)]="form.lastName" />
       </div>
-      <div class="flex flex-column gap-2">
-        <label>Email</label>
-        <input pInputText type="email" formControlName="email" />
-      </div>
-      <div class="flex flex-column gap-2">
-        <label>Bio</label>
-        <textarea pInputTextarea formControlName="bio" rows="3"></textarea>
-      </div>
-      <div class="flex flex-column gap-2">
-        <label>Domaine</label>
-        <p-dropdown formControlName="domainId" [options]="domains" optionLabel="name" optionValue="id" placeholder="Sélectionner"></p-dropdown>
-      </div>
-      <p-button type="submit" label="Sauvegarder" [loading]="loading"></p-button>
-    </form>
-  </p-dialog>
-
-  <p-toast></p-toast>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" [(ngModel)]="form.email" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Domaine</label>
+      <select class="form-input" [(ngModel)]="form.domainId">
+        <option [ngValue]="null">-- S&eacute;lectionner --</option>
+        <option *ngFor="let d of domains" [ngValue]="d.id">{{ d.name }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bio</label>
+      <textarea class="form-input" [(ngModel)]="form.bio" rows="3" style="resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1rem">
+      <button class="btn btn-outline" (click)="showDialog = false">Annuler</button>
+      <button class="btn btn-primary" (click)="save()">{{ editingId ? 'Modifier' : 'Ajouter' }}</button>
+    </div>
+  </div>
 </div>

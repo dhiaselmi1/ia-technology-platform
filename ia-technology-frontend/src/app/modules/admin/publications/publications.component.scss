@@ -1,0 +1,138 @@
+:host { display: block; }
+
+.filters-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: .375rem;
+}
+
+.filter-label {
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  display: flex;
+  align-items: center;
+  gap: .375rem;
+
+  i { font-size: .75rem; }
+}
+
+.filter-select {
+  min-width: 200px;
+  padding: .5rem .75rem;
+  font-size: .8125rem;
+}
+
+.filter-result {
+  margin-left: auto;
+  font-size: .8125rem;
+  color: var(--primary);
+  font-weight: 500;
+  align-self: flex-end;
+  padding-bottom: .375rem;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-content {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.upload-zone {
+  border: 2px dashed var(--surface-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  transition: border-color .2s, background .2s;
+
+  &:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+}
+
+.upload-label {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  color: var(--text-secondary);
+
+  i {
+    font-size: 2rem;
+    color: var(--primary);
+  }
+
+  span {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+
+  small {
+    font-size: .75rem;
+    color: var(--text-muted);
+  }
+}
+
+.file-attached {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-ground);
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+
+  strong {
+    font-size: .875rem;
+    display: block;
+  }
+}
+
+.upload-progress {
+  font-size: .75rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+.badge-purple {
+  background: #ede9fe;
+  color: #7c3aed;
+}

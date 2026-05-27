@@ -1,58 +1,130 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, CardModule, ButtonModule, InputGroupModule, InputTextModule, DropdownModule],
-  templateUrl: './search.component.html'
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './search.component.html',
+  styleUrl: './search.component.scss'
 })
 export class SearchComponent implements OnInit {
-  private apiService = inject(ApiService);
+  private api = inject(ApiService);
+  private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
+
+  private readonly BASE = 'http://localhost:8080/api';
 
   searchQuery = '';
   publications: any[] = [];
-  researchers: any[] = [];
+  allPublications: any[] = [];
   domains: any[] = [];
-  selectedDomain: number | null = null;
+  selectedDomains: Set<number> = new Set();
+  resultCount = 0;
 
-  ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      if (params['q']) {
-        this.searchQuery = params['q'];
-        this.performSearch();
-      }
-    });
-    this.loadDomains();
+  searchMode: 'classic' | 'semantic' | 'qa' = 'classic';
+  semanticResults: any[] = [];
+  qaResults: any[] = [];
+  loadingAi = false;
+
+  get isLoggedIn(): boolean {
+    return this.auth.isLoggedIn();
   }
 
-  loadDomains(): void {
-    this.apiService.get<any>('domains').subscribe({
-      next: (res: any) => this.domains = res || []
+  ngOnInit(): void {
+    this.api.get<any[]>('domains').subscribe(r => this.domains = r || []);
+    this.api.get<any[]>('publications').subscribe(r => {
+      this.allPublications = r || [];
+      this.publications = this.allPublications;
+      this.resultCount = this.publications.length;
     });
+    this.route.queryParams.subscribe(p => {
+      if (p['q']) { this.searchQuery = p['q']; this.performSearch(); }
+    });
+  }
+
+  setMode(mode: 'classic' | 'semantic' | 'qa'): void {
+    this.searchMode = mode;
+    this.semanticResults = [];
+    this.qaResults = [];
+    if (this.searchQuery.trim()) this.performSearch();
   }
 
   performSearch(): void {
-    if (!this.searchQuery.trim() && !this.selectedDomain) return;
+    if (this.searchMode === 'semantic' && this.isLoggedIn) {
+      this.semanticSearch();
+      return;
+    }
+    if (this.searchMode === 'qa' && this.isLoggedIn) {
+      this.askQuestion();
+      return;
+    }
 
-    const params: any = {};
-    if (this.searchQuery.trim()) params['q'] = this.searchQuery;
-    if (this.selectedDomain) params['domain'] = this.selectedDomain;
+    let results = this.allPublications;
+    if (this.searchQuery.trim()) {
+      const q = this.searchQuery.toLowerCase();
+      results = results.filter(p =>
+        p.title?.toLowerCase().includes(q) ||
+        (p.abstractText || p.abstract_ || '').toLowerCase().includes(q) ||
+        p.researcherName?.toLowerCase().includes(q)
+      );
+    }
+    if (this.selectedDomains.size > 0) {
+      results = results.filter(p => this.selectedDomains.has(p.domainId));
+    }
+    this.publications = results;
+    this.resultCount = results.length;
+  }
 
-    this.apiService.get<any>('search', params).subscribe({
-      next: (res: any) => {
-        this.publications = res.publications || [];
-        this.researchers = res.researchers || [];
-      }
+  semanticSearch(): void {
+    if (!this.searchQuery.trim()) return;
+    this.loadingAi = true;
+    this.semanticResults = [];
+    this.http.post<any>(`${this.BASE}/ai/semantic-search?query=${encodeURIComponent(this.searchQuery)}&topN=10`, {}).subscribe({
+      next: (res) => {
+        const resultIds = (res?.results || []).map((r: any) => ({ id: r.id, score: r.score }));
+        this.semanticResults = resultIds.map((r: any) => {
+          const pub = this.allPublications.find(p => p.id === r.id);
+          return pub ? { ...pub, similarityScore: r.score } : null;
+        }).filter((r: any) => r !== null);
+        this.resultCount = this.semanticResults.length;
+        this.loadingAi = false;
+      },
+      error: () => { this.loadingAi = false; }
     });
+  }
+
+  askQuestion(): void {
+    if (!this.searchQuery.trim()) return;
+    this.loadingAi = true;
+    this.qaResults = [];
+    this.http.post<any>(`${this.BASE}/ai/ask?question=${encodeURIComponent(this.searchQuery)}&topN=5`, {}).subscribe({
+      next: (res) => {
+        const results = res?.results || [];
+        this.qaResults = results.map((r: any) => {
+          const pub = this.allPublications.find(p => p.id === r.id);
+          return pub ? { ...pub, answer: r.answer, score: r.score } : null;
+        }).filter((r: any) => r !== null);
+        this.resultCount = this.qaResults.length;
+        this.loadingAi = false;
+      },
+      error: () => { this.loadingAi = false; }
+    });
+  }
+
+  toggleDomain(id: number): void {
+    if (this.selectedDomains.has(id)) this.selectedDomains.delete(id);
+    else this.selectedDomains.add(id);
+    this.performSearch();
+  }
+
+  getSimilarityPercent(score: number): string {
+    return Math.round(score * 100) + '%';
   }
 }

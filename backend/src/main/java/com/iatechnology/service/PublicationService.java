@@ -22,24 +22,29 @@ public class PublicationService {
     private final DomainRepository domainRepository;
     private final AuditLogService auditLogService;
 
+    @Transactional(readOnly = true)
     public List<PublicationDTO> getAll() {
         return publicationRepository.findAll().stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public PublicationDTO getById(Long id) {
         return publicationRepository.findById(id)
                 .map(this::toDTO)
                 .orElseThrow(() -> new RuntimeException("Publication non trouvée"));
     }
 
+    @Transactional(readOnly = true)
     public List<PublicationDTO> searchByQuery(String query) {
         return publicationRepository.searchByTitleOrAbstract(query).stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<PublicationDTO> getByResearcher(Long researcherId) {
         return publicationRepository.findByResearcherId(researcherId).stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<PublicationDTO> getByDomain(Long domainId) {
         return publicationRepository.findByDomainId(domainId).stream().map(this::toDTO).toList();
     }
@@ -57,6 +62,7 @@ public class PublicationService {
                 .doi(dto.getDoi())
                 .filePath(dto.getFilePath())
                 .publishedDate(dto.getPublishedDate())
+                .featured(dto.isFeatured())
                 .researcher(researcher)
                 .domain(domain)
                 .build();
@@ -74,6 +80,7 @@ public class PublicationService {
         publication.setDoi(dto.getDoi());
         publication.setFilePath(dto.getFilePath());
         publication.setPublishedDate(dto.getPublishedDate());
+        publication.setFeatured(dto.isFeatured());
         Publication updated = publicationRepository.save(publication);
         auditLogService.log("UPDATE", "Publication", id, username, "Publication updated");
         return toDTO(updated);
@@ -100,6 +107,7 @@ public class PublicationService {
                 .researcherName(publication.getResearcher().getFirstName() + " " + publication.getResearcher().getLastName())
                 .domainId(publication.getDomain().getId())
                 .domainName(publication.getDomain().getName())
+                .featured(publication.isFeatured())
                 .createdAt(publication.getCreatedAt())
                 .build();
     }

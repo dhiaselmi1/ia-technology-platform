@@ -1,26 +1,175 @@
-<div class="py-8">
-  <h1 class="text-3xl font-bold mb-4">Gestion des Publications</h1>
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+  <div>
+    <h1>Gestion des Publications</h1>
+    <p>G&eacute;rez et organisez l'archive scientifique de l'IA Research Hub.</p>
+  </div>
+  <div style="display:flex;gap:.75rem;align-items:center">
+    <div style="position:relative">
+      <i class="pi pi-search" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text-muted)"></i>
+      <input class="form-input" [(ngModel)]="searchQuery" placeholder="Rechercher une publication..."
+             style="padding-left:2.25rem;width:280px" />
+    </div>
+    <button class="btn btn-primary" (click)="openNew()"><i class="pi pi-plus"></i> Ajouter une publication</button>
+  </div>
+</div>
 
-  <p-table [value]="publications" [paginator]="true" [rows]="10" responsiveLayout="scroll">
-    <ng-template pTemplate="header">
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Publications</div>
+    <div class="kpi-value">{{ publications.length }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Domaines Couverts</div>
+    <div class="kpi-value">{{ domains.length }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Chercheurs</div>
+    <div class="kpi-value">{{ researchers.length }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Avec fichier</div>
+    <div class="kpi-value">{{ withFileCount }}</div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+  <div class="filter-group">
+    <label class="filter-label"><i class="pi pi-users"></i> Chercheur</label>
+    <select class="form-input filter-select" [(ngModel)]="filterResearcherId">
+      <option [ngValue]="null">Tous les chercheurs</option>
+      <option *ngFor="let r of researchers" [ngValue]="r.id">{{ r.firstName }} {{ r.lastName }}</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label"><i class="pi pi-sitemap"></i> Domaine</label>
+    <select class="form-input filter-select" [(ngModel)]="filterDomainId">
+      <option [ngValue]="null">Tous les domaines</option>
+      <option *ngFor="let d of domains" [ngValue]="d.id">{{ d.name }}</option>
+    </select>
+  </div>
+  <div class="filter-group" style="align-self:flex-end">
+    <button *ngIf="hasActiveFilters" class="btn btn-sm btn-outline" (click)="clearFilters()">
+      <i class="pi pi-filter-slash"></i> R&eacute;initialiser
+    </button>
+  </div>
+  <div class="filter-result" *ngIf="hasActiveFilters">
+    {{ filtered.length }} r&eacute;sultat{{ filtered.length > 1 ? 's' : '' }} sur {{ publications.length }}
+  </div>
+</div>
+
+<div class="data-card">
+  <table class="data-table">
+    <thead>
       <tr>
         <th>Titre</th>
         <th>Chercheur</th>
         <th>Domaine</th>
+        <th>Date</th>
+        <th>&Agrave; la une</th>
+        <th>Fichier</th>
         <th>Actions</th>
       </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-pub>
-      <tr>
-        <td>{{ pub.title }}</td>
-        <td>{{ pub.researcherName }}</td>
-        <td>{{ pub.domainName }}</td>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of filtered">
         <td>
-          <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deletePublication(pub.id)"></p-button>
+          <strong>{{ p.title | slice:0:50 }}{{ p.title?.length > 50 ? '...' : '' }}</strong>
+        </td>
+        <td style="font-size:.875rem">{{ p.researcherName }}</td>
+        <td><span class="badge badge-primary">{{ p.domainName }}</span></td>
+        <td style="font-size:.8125rem;color:var(--text-muted)">{{ p.publishedDate | date:'dd MMM yyyy' }}</td>
+        <td>
+          <button class="btn btn-sm" [class.btn-primary]="p.featured" [class.btn-outline]="!p.featured"
+                  (click)="toggleFeatured(p)">
+            <i class="pi" [class.pi-star-fill]="p.featured" [class.pi-star]="!p.featured"></i>
+            {{ p.featured ? 'Oui' : 'Non' }}
+          </button>
+        </td>
+        <td>
+          <span *ngIf="p.filePath" class="badge badge-danger"><i class="pi pi-file-pdf" style="font-size:.7rem"></i> PDF</span>
+          <span *ngIf="p.doi" class="badge badge-purple">DOI</span>
+          <span *ngIf="!p.filePath && !p.doi" style="color:var(--text-muted);font-size:.8125rem">—</span>
+        </td>
+        <td>
+          <div style="display:flex;gap:.5rem">
+            <a *ngIf="p.filePath" [href]="'http://localhost:8080/uploads/' + p.filePath" target="_blank"
+               class="btn btn-sm btn-outline" title="T&eacute;l&eacute;charger"><i class="pi pi-download"></i></a>
+            <button class="btn btn-sm btn-outline" (click)="edit(p)"><i class="pi pi-pencil"></i></button>
+            <button class="btn btn-sm btn-outline" style="color:var(--danger)" (click)="delete(p.id)"><i class="pi pi-trash"></i></button>
+          </div>
         </td>
       </tr>
-    </ng-template>
-  </p-table>
+    </tbody>
+  </table>
+</div>
 
-  <p-toast></p-toast>
+<!-- Dialog -->
+<div *ngIf="showDialog" class="dialog-backdrop" (click)="showDialog = false">
+  <div class="dialog-content" (click)="$event.stopPropagation()">
+    <h2 style="margin-bottom:1.5rem">{{ editingId ? 'Modifier' : 'Ajouter' }} une publication</h2>
+    <div class="form-group">
+      <label class="form-label">Titre</label>
+      <input class="form-input" [(ngModel)]="form.title" />
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Chercheur</label>
+        <select class="form-input" [(ngModel)]="form.researcherId">
+          <option [ngValue]="null">-- S&eacute;lectionner --</option>
+          <option *ngFor="let r of researchers" [ngValue]="r.id">{{ r.firstName }} {{ r.lastName }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Domaine</label>
+        <select class="form-input" [(ngModel)]="form.domainId">
+          <option [ngValue]="null">-- S&eacute;lectionner --</option>
+          <option *ngFor="let d of domains" [ngValue]="d.id">{{ d.name }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Date de publication</label>
+        <input class="form-input" type="date" [(ngModel)]="form.publishedDate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">DOI</label>
+        <input class="form-input" [(ngModel)]="form.doi" placeholder="10.xxxx/xxxxx" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">R&eacute;sum&eacute;</label>
+      <textarea class="form-input" [(ngModel)]="form.abstract_" rows="5" style="resize:vertical"></textarea>
+    </div>
+
+    <!-- File upload -->
+    <div class="form-group">
+      <label class="form-label">Document (PDF)</label>
+      <div class="upload-zone" *ngIf="!uploadedFileName">
+        <input type="file" accept=".pdf,.doc,.docx" (change)="onFileSelected($event)" id="pubFile" style="display:none" />
+        <label for="pubFile" class="upload-label">
+          <i class="pi pi-cloud-upload"></i>
+          <span>Cliquer pour choisir un fichier</span>
+          <small>PDF, DOC, DOCX — max 10 Mo</small>
+        </label>
+      </div>
+      <div class="file-attached" *ngIf="uploadedFileName">
+        <div class="file-info">
+          <i class="pi pi-file-pdf" style="font-size:1.5rem;color:var(--danger)"></i>
+          <div>
+            <strong>{{ uploadedFileName }}</strong>
+            <div *ngIf="uploadingFile" class="upload-progress"><i class="pi pi-spin pi-spinner"></i> Upload en cours...</div>
+            <div *ngIf="!uploadingFile && form.filePath" style="font-size:.75rem;color:var(--success)"><i class="pi pi-check"></i> Fichier upload&eacute;</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline" style="color:var(--danger)" (click)="removeFile()"><i class="pi pi-trash"></i></button>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1rem">
+      <button class="btn btn-outline" (click)="showDialog = false">Annuler</button>
+      <button class="btn btn-primary" [disabled]="uploadingFile" (click)="save()">{{ editingId ? 'Modifier' : 'Ajouter' }}</button>
+    </div>
+  </div>
 </div>

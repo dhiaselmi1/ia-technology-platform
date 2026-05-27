@@ -1,0 +1,119 @@
+<div *ngIf="loading" style="text-align:center;padding:4rem;color:var(--text-muted)">
+  <i class="pi pi-spin pi-spinner" style="font-size:2rem"></i>
+  <p style="margin-top:1rem">Chargement...</p>
+</div>
+
+<div *ngIf="!loading && !publication" style="text-align:center;padding:4rem;color:var(--text-muted)">
+  <p>Publication introuvable.</p>
+  <a routerLink="/" class="btn btn-outline" style="margin-top:1rem">Retour &agrave; l'accueil</a>
+</div>
+
+<div *ngIf="!loading && publication" class="pub-detail">
+  <!-- Header -->
+  <div class="pub-detail-header">
+    <h1>{{ publication.title }}</h1>
+    <div class="pub-detail-meta">
+      <span class="badge badge-primary">{{ publication.domainName }}</span>
+      <span><i class="pi pi-user" style="font-size:.75rem"></i> {{ publication.researcherName }}</span>
+      <span><i class="pi pi-calendar" style="font-size:.75rem"></i> {{ publication.publishedDate | date:'dd MMMM yyyy' }}</span>
+      <a *ngIf="pdfUrl" [href]="pdfUrl" target="_blank" class="btn btn-sm btn-primary">
+        <i class="pi pi-download"></i> T&eacute;l&eacute;charger PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- AI Keywords -->
+  <section *ngIf="isLoggedIn" class="ai-section">
+    <div class="ai-section-header">
+      <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> Mots-cl&eacute;s IA</h3>
+      <span class="ai-badge">TF-IDF</span>
+    </div>
+    <div *ngIf="loadingKeywords" class="ai-loading">
+      <i class="pi pi-spin pi-spinner"></i> Extraction en cours...
+    </div>
+    <div *ngIf="!loadingKeywords && keywords.length > 0" class="keywords-list">
+      <span *ngFor="let kw of keywords" class="keyword-chip">{{ kw }}</span>
+    </div>
+    <div *ngIf="!loadingKeywords && keywords.length === 0" class="ai-empty">
+      Aucun mot-cl&eacute; extrait. V&eacute;rifiez que le service IA est actif.
+    </div>
+  </section>
+
+  <!-- Abstract -->
+  <section>
+    <h2>Abstract</h2>
+    <p>{{ publication.abstractText || publication.abstract_ }}</p>
+  </section>
+
+  <!-- AI Summarize -->
+  <section *ngIf="isLoggedIn" class="ai-section">
+    <div class="ai-section-header">
+      <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> R&eacute;sum&eacute; IA</h3>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-sm" [class.btn-primary]="summaryMode === 'tldr'" [class.btn-outline]="summaryMode !== 'tldr'"
+                (click)="summarize('tldr')" [disabled]="loadingSummary">
+          <i class="pi pi-align-left"></i> TL;DR
+        </button>
+        <button class="btn btn-sm" [class.btn-primary]="summaryMode === 'vulgarize'" [class.btn-outline]="summaryMode !== 'vulgarize'"
+                (click)="summarize('vulgarize')" [disabled]="loadingSummary">
+          <i class="pi pi-comments"></i> Vulgariser
+        </button>
+      </div>
+    </div>
+    <div *ngIf="loadingSummary" class="ai-loading">
+      <i class="pi pi-spin pi-spinner"></i> G&eacute;n&eacute;ration en cours...
+    </div>
+    <div *ngIf="!loadingSummary && summaryText" class="summary-box">
+      <span class="ai-badge" style="margin-bottom:.5rem;display:inline-block">{{ summaryMode === 'tldr' ? 'TL;DR' : 'Version simplifi&eacute;e' }}</span>
+      <p>{{ summaryText }}</p>
+    </div>
+    <div *ngIf="summaryError" class="ai-empty" style="color:var(--warning)">
+      <i class="pi pi-exclamation-triangle"></i> {{ summaryError }}
+    </div>
+  </section>
+
+  <!-- DOI -->
+  <section *ngIf="publication.doi">
+    <h2>DOI</h2>
+    <p><a [href]="'https://doi.org/' + publication.doi" target="_blank" style="color:var(--primary)">{{ publication.doi }}</a></p>
+  </section>
+
+  <!-- AI Recommendations -->
+  <section *ngIf="isLoggedIn" class="ai-section">
+    <div class="ai-section-header">
+      <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> Publications similaires</h3>
+      <span class="ai-badge">Cosine Similarity</span>
+    </div>
+    <div *ngIf="loadingRecommendations" class="ai-loading">
+      <i class="pi pi-spin pi-spinner"></i> Recherche de publications similaires...
+    </div>
+    <div *ngIf="!loadingRecommendations && recommendations.length > 0" class="recommendations-grid">
+      <a *ngFor="let rec of recommendations" [routerLink]="['/publications', rec.id]" class="recommendation-card">
+        <div class="rec-score">
+          <span class="rec-percent">{{ getSimilarityPercent(rec.similarity_score) }}</span>
+          <span class="rec-label">similarit&eacute;</span>
+        </div>
+        <div class="rec-info">
+          <h4>{{ rec.text | slice:0:80 }}{{ rec.text?.length > 80 ? '...' : '' }}</h4>
+        </div>
+      </a>
+    </div>
+    <div *ngIf="!loadingRecommendations && recommendations.length === 0" class="ai-empty">
+      Aucune recommandation disponible. V&eacute;rifiez que le service IA est actif.
+    </div>
+  </section>
+
+  <!-- Login prompt for non-authenticated users -->
+  <section *ngIf="!isLoggedIn" class="ai-login-prompt">
+    <i class="pi pi-lock" style="font-size:1.5rem;color:var(--primary)"></i>
+    <div>
+      <h3>Fonctionnalit&eacute;s IA</h3>
+      <p>Connectez-vous pour acc&eacute;der aux mots-cl&eacute;s automatiques et aux recommandations de publications similaires.</p>
+    </div>
+    <a routerLink="/auth/login" class="btn btn-primary">Se connecter</a>
+  </section>
+
+  <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--surface-border)">
+    <a routerLink="/search" class="btn btn-outline"><i class="pi pi-arrow-left"></i> Retour aux publications</a>
+  </div>
+</div>

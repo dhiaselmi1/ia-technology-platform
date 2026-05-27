@@ -1,58 +1,66 @@
-<div class="flex justify-content-center align-items-center min-h-screen">
-  <p-card class="w-full" [style]="{ 'max-width': '400px' }">
-    <ng-template pTemplate="header">
-      <div class="text-center p-4">
-        <h1 class="text-2xl font-bold">IA-Technology</h1>
-        <p class="text-gray-600">Connexion</p>
-      </div>
-    </ng-template>
+<div class="auth-page">
+  <a routerLink="/" class="back-home-btn"><i class="pi pi-arrow-left"></i> Retour &agrave; l'accueil</a>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-column gap-3">
-      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage"></p-message>
+  <div class="auth-brand">
+    <span class="brand-icon"><i class="pi pi-bolt"></i></span>
+    IA-Technology
+  </div>
+  <h1 style="font-size:1.5rem;font-weight:700;margin-bottom:.25rem">Acc&egrave;s Chercheur</h1>
+  <p class="auth-subtitle">IA Research Hub Portal</p>
 
-      <div class="flex flex-column gap-2">
-        <label for="email" class="font-semibold">Email</label>
-        <input
-          pInputText
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="votre@email.com"
-          [class.ng-invalid]="email?.invalid && email?.touched"
-        />
-        <small class="text-red-500" *ngIf="email?.invalid && email?.touched">
-          {{ email?.errors?.['required'] ? 'Email requis' : 'Email invalide' }}
-        </small>
+  <div class="auth-card">
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label">Adresse e-mail</label>
+        <div class="form-input-icon">
+          <i class="pi pi-envelope"></i>
+          <input class="form-input" type="email" [(ngModel)]="email" name="email"
+                 placeholder="nom&#64;institution.fr" required />
+        </div>
       </div>
 
-      <div class="flex flex-column gap-2">
-        <label for="password" class="font-semibold">Mot de passe</label>
-        <input
-          pInputText
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="••••••"
-          [class.ng-invalid]="password?.invalid && password?.touched"
-        />
-        <small class="text-red-500" *ngIf="password?.invalid && password?.touched">
-          {{ password?.errors?.['required'] ? 'Mot de passe requis' : 'Min 6 caractères' }}
-        </small>
+      <div class="form-group">
+        <div class="password-row">
+          <label class="form-label">Mot de passe</label>
+          <a href="javascript:void(0)">Oubli&eacute; ?</a>
+        </div>
+        <div class="form-input-icon" style="position:relative">
+          <i class="pi pi-lock"></i>
+          <input class="form-input" [type]="showPassword ? 'text' : 'password'"
+                 [(ngModel)]="password" name="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required
+                 style="padding-right:2.5rem" />
+          <i class="pi" [class.pi-eye]="!showPassword" [class.pi-eye-slash]="showPassword"
+             (click)="showPassword = !showPassword"
+             style="position:absolute;right:.875rem;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text-muted);left:auto"></i>
+        </div>
       </div>
 
-      <p-button
-        type="submit"
-        label="Se connecter"
-        [loading]="loading"
-        [disabled]="form.invalid || loading"
-        class="w-full"
-      ></p-button>
+      <label class="remember-row">
+        <input type="checkbox" [(ngModel)]="rememberMe" name="remember" />
+        Rester connect&eacute;
+      </label>
+
+      <button type="submit" class="auth-submit" [disabled]="loading">
+        {{ loading ? 'Connexion...' : 'Se connecter' }}
+        <i *ngIf="!loading" class="pi pi-arrow-right"></i>
+      </button>
     </form>
 
-    <ng-template pTemplate="footer">
-      <div class="text-center">
-        <p class="text-sm">Pas encore de compte ? <a routerLink="/auth/register" class="text-blue-500 font-semibold">S'inscrire</a></p>
-      </div>
-    </ng-template>
-  </p-card>
+    <div class="auth-divider"></div>
+
+    <p class="auth-footer-link">
+      Nouveau sur la plateforme ? <a routerLink="/auth/register">Cr&eacute;er un compte</a>
+    </p>
+  </div>
+
+  <div class="auth-page-footer">
+    <div class="footer-links">
+      <a href="#">Support</a>
+      <a href="#">Confidentialit&eacute;</a>
+      <a href="#">Directives</a>
+    </div>
+    <div class="footer-brand">Precision Curator Intelligence</div>
+  </div>
 </div>

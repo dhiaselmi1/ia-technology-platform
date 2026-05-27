@@ -45,6 +45,8 @@ public class User implements UserDetails {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    public String getDisplayName() { return username; }
+
     // UserDetails — authentication is done by email
     @Override
     public String getUsername() { return email; }

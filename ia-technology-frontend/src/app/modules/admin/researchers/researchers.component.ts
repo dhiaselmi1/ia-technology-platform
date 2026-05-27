@@ -1,107 +1,69 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-researchers',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, DropdownModule, ToastModule],
-  providers: [MessageService],
+  imports: [CommonModule, FormsModule],
   templateUrl: './researchers.component.html',
   styleUrl: './researchers.component.scss'
 })
 export class ResearchersComponent implements OnInit {
-  private apiService = inject(ApiService);
-  private messageService = inject(MessageService);
-  private fb = inject(FormBuilder);
+  private api = inject(ApiService);
 
   researchers: any[] = [];
   domains: any[] = [];
-  displayDialog = false;
-  form: FormGroup;
-  loading = false;
+  searchQuery = '';
+  showDialog = false;
   editingId: number | null = null;
 
-  constructor() {
-    this.form = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      bio: [''],
-      photoUrl: [''],
-      domainId: ['', Validators.required]
-    });
-  }
+  form = { firstName: '', lastName: '', email: '', bio: '', photoUrl: '', domainId: null as number | null };
 
   ngOnInit(): void {
-    this.loadResearchers();
-    this.loadDomains();
+    this.load();
+    this.api.get<any[]>('domains').subscribe(r => this.domains = r || []);
   }
 
-  loadResearchers(): void {
-    this.apiService.get<any>('researchers').subscribe({
-      next: (res: any) => this.researchers = res || [],
-      error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les chercheurs' })
-    });
+  load(): void {
+    this.api.get<any[]>('researchers').subscribe(r => this.researchers = r || []);
   }
 
-  loadDomains(): void {
-    this.apiService.get<any>('domains').subscribe({
-      next: (res: any) => this.domains = res || []
-    });
+  get filtered(): any[] {
+    if (!this.searchQuery.trim()) return this.researchers;
+    const q = this.searchQuery.toLowerCase();
+    return this.researchers.filter(r =>
+      `${r.firstName} ${r.lastName}`.toLowerCase().includes(q) || (r.domainName||'').toLowerCase().includes(q)
+    );
   }
 
-  openDialog(): void {
+  openNew(): void {
     this.editingId = null;
-    this.form.reset();
-    this.displayDialog = true;
+    this.form = { firstName: '', lastName: '', email: '', bio: '', photoUrl: '', domainId: null };
+    this.showDialog = true;
   }
 
-  editResearcher(researcher: any): void {
-    this.editingId = researcher.id;
-    this.form.patchValue(researcher);
-    this.displayDialog = true;
+  edit(r: any): void {
+    this.editingId = r.id;
+    this.form = { firstName: r.firstName, lastName: r.lastName, email: r.email, bio: r.bio || '', photoUrl: r.photoUrl || '', domainId: r.domainId };
+    this.showDialog = true;
   }
 
-  saveResearcher(): void {
-    if (this.form.invalid) return;
-    this.loading = true;
-
-    const request = this.editingId
-      ? this.apiService.put(`researchers/${this.editingId}`, this.form.value)
-      : this.apiService.post('researchers', this.form.value);
-
-    request.subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Chercheur sauvegardé' });
-        this.displayDialog = false;
-        this.loadResearchers();
-        this.loading = false;
-      },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de sauvegarder' });
-        this.loading = false;
-      }
-    });
+  save(): void {
+    const req = this.editingId
+      ? this.api.put(`researchers/${this.editingId}`, this.form)
+      : this.api.post('researchers', this.form);
+    req.subscribe({ next: () => { this.showDialog = false; this.load(); } });
   }
 
-  deleteResearcher(id: number): void {
-    if (confirm('Êtes-vous sûr ?')) {
-      this.apiService.delete(`researchers/${id}`).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Chercheur supprimé' });
-          this.loadResearchers();
-        },
-        error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de supprimer' })
-      });
+  delete(id: number): void {
+    if (confirm('Supprimer ce chercheur ?')) {
+      this.api.delete(`researchers/${id}`).subscribe(() => this.load());
     }
+  }
+
+  getInitials(r: any): string {
+    return ((r.firstName?.[0] || '') + (r.lastName?.[0] || '')).toUpperCase();
   }
 }

@@ -24,6 +24,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   trendModelInfo: any = null;
   trendsLoaded = false;
   trendsError = false;
+  showMetricsDetail = false;
 
   @ViewChild('domainChart') domainChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('monthChart') monthChartRef!: ElementRef<HTMLCanvasElement>;

@@ -91,61 +91,60 @@
   </div>
 </div>
 
-<!-- Model metrics -->
+<!-- Model metrics (compact) -->
 <div *ngIf="trendModelInfo" class="data-card">
-  <div class="card-header">
-    <h3><i class="pi pi-bolt" style="color:var(--primary)"></i> M&eacute;triques du mod&egrave;le de classification</h3>
-    <span class="chart-subtitle">{{ trendModelInfo.model }}</span>
+  <div class="card-header" (click)="showMetricsDetail = !showMetricsDetail" style="cursor:pointer">
+    <h3>
+      <i class="pi pi-bolt" style="color:var(--primary)"></i> M&eacute;triques ML
+      <span style="font-weight:400;font-size:.8125rem;color:var(--text-muted);margin-left:.75rem">
+        {{ trendModelInfo.model }} — Accuracy {{ (trendModelInfo.accuracy_cv * 100).toFixed(1) }}%
+      </span>
+    </h3>
+    <button class="btn btn-sm btn-ghost">
+      <i class="pi" [class.pi-chevron-down]="!showMetricsDetail" [class.pi-chevron-up]="showMetricsDetail"></i>
+    </button>
   </div>
-  <div class="metrics-grid">
-    <div class="metric-item">
-      <div class="metric-value">{{ (trendModelInfo.accuracy_cv * 100).toFixed(1) }}%</div>
-      <div class="metric-label">Accuracy (CV)</div>
+  <div *ngIf="showMetricsDetail">
+    <div class="metrics-grid">
+      <div class="metric-item">
+        <div class="metric-value">{{ (trendModelInfo.accuracy_cv * 100).toFixed(1) }}%</div>
+        <div class="metric-label">Accuracy (CV)</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">{{ trendModelInfo.n_estimators }}</div>
+        <div class="metric-label">Estimateurs</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">{{ trendModelInfo.n_features }}</div>
+        <div class="metric-label">Features</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">{{ trendModelInfo.n_classes }}</div>
+        <div class="metric-label">Classes</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">{{ trendModelInfo.n_original_samples }}</div>
+        <div class="metric-label">Domaines</div>
+      </div>
+      <div class="metric-item">
+        <div class="metric-value">{{ trendModelInfo.n_training_samples }}</div>
+        <div class="metric-label">&Eacute;ch. synth.</div>
+      </div>
     </div>
-    <div class="metric-item">
-      <div class="metric-value">{{ trendModelInfo.n_estimators }}</div>
-      <div class="metric-label">Estimateurs</div>
-    </div>
-    <div class="metric-item">
-      <div class="metric-value">{{ trendModelInfo.n_features }}</div>
-      <div class="metric-label">Features</div>
-    </div>
-    <div class="metric-item">
-      <div class="metric-value">{{ trendModelInfo.n_classes }}</div>
-      <div class="metric-label">Classes</div>
-    </div>
-    <div class="metric-item">
-      <div class="metric-value">{{ trendModelInfo.n_original_samples }}</div>
-      <div class="metric-label">Domaines</div>
-    </div>
-    <div class="metric-item">
-      <div class="metric-value">{{ trendModelInfo.n_augmented_samples }}</div>
-      <div class="metric-label">&Eacute;ch. augment&eacute;s</div>
-    </div>
+    <table class="data-table" *ngIf="trendModelInfo.per_class_metrics" style="margin-top:.75rem">
+      <thead>
+        <tr><th>Classe</th><th>Precision</th><th>Recall</th><th>F1-Score</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cls of trendModelInfo.classes">
+          <td><span [class]="'trend-badge trend-' + cls">{{ cls === 'rising' ? 'En hausse' : cls === 'declining' ? 'En baisse' : 'Stable' }}</span></td>
+          <td>{{ (trendModelInfo.per_class_metrics[cls]?.precision * 100).toFixed(1) }}%</td>
+          <td>{{ (trendModelInfo.per_class_metrics[cls]?.recall * 100).toFixed(1) }}%</td>
+          <td>{{ (trendModelInfo.per_class_metrics[cls]?.f1_score * 100).toFixed(1) }}%</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <!-- Per-class metrics -->
-  <table class="data-table" *ngIf="trendModelInfo.per_class_metrics" style="margin-top:1rem">
-    <thead>
-      <tr>
-        <th>Classe</th>
-        <th>Precision</th>
-        <th>Recall</th>
-        <th>F1-Score</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let cls of trendModelInfo.classes">
-        <td>
-          <span [class]="'trend-badge trend-' + cls">
-            {{ cls === 'rising' ? 'En hausse' : cls === 'declining' ? 'En baisse' : 'Stable' }}
-          </span>
-        </td>
-        <td>{{ (trendModelInfo.per_class_metrics[cls]?.precision * 100).toFixed(1) }}%</td>
-        <td>{{ (trendModelInfo.per_class_metrics[cls]?.recall * 100).toFixed(1) }}%</td>
-        <td>{{ (trendModelInfo.per_class_metrics[cls]?.f1_score * 100).toFixed(1) }}%</td>
-      </tr>
-    </tbody>
-  </table>
 </div>
 
 <!-- Recent Activity -->

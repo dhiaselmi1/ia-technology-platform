@@ -650,6 +650,8 @@ Ce projet est fourni à titre éducatif pour le cours "Développement Web Avanc�
 
 ## 👨‍💻 Auteur
 
-Développé par l'équipe IA-Technology pour la gestion des travaux scientifiques.
-
+Mohamed Dhia Selmi
+Malek Belhadj
+Ahmed Hajjem 
+Yassine Hachani 
 **Dernière mise à jour** : Avril 2026
